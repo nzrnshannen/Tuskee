@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-pink: #FDF6EB; /* Milk Cream background */
+  --color-brand-plum: #3E2312; /* Deep Chocolate Outline */
+  --color-brand-cream: #EADBC8; /* Cookie Beige */
+  --color-brand-gold: #FF9E3A; /* Cat Orange */
+  --color-brand-white: #ffffff;
+  --color-brand-pinklight: #FFFBF5; /* Soft Milk Cream window fill */
+  --color-brand-plumshadow: #241107;
+  
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-cozy: 'Fredoka', sans-serif;
+}
+
+/* Global resets for pixel operating system */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+body {
+  font-family: var(--font-cozy);
+  background-color: #FDFBF7;
+  color: var(--color-brand-plum);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-y: auto; /* Allow natural browser scrolling for small viewports */
+  height: 100vh;
+  /* Retro desktop grid wallpaper dots - softened to 8% opacity */
+  background-image: radial-gradient(rgba(62, 35, 18, 0.08) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+  user-select: none;
+}
+
+/* Custom beveled styles for Windows 95/98 OS look reskinned in Cozy Cat UI */
+
+/* Adorable Retro Operating System Windows */
+.retro-window {
+  background-color: var(--color-brand-pinklight);
+  border: 2.5px solid var(--color-brand-plum);
+  box-shadow: 
+    inset 2px 2px 0 0 var(--color-brand-white),
+    inset -2px -2px 0 0 #ebdcd0,
+    4px 4px 0 0 rgba(62, 35, 18, 0.12);
+  position: relative;
+  /* Overflow must be visible to let decorative cat ears pop out of title headers! */
+  overflow: visible; 
+}
+
+.retro-window-header {
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2.5px solid var(--color-brand-plum);
+  position: relative; /* relative for child cat ears positioning */
+}
+
+.retro-window-title {
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+/* Retro OS Button style (Start button, controls) */
+.retro-btn {
+  background-color: var(--color-brand-cream);
+  border: 2px solid var(--color-brand-plum);
+  box-shadow: 
+    inset 1.5px 1.5px 0 0 var(--color-brand-white),
+    inset -1.5px -1.5px 0 0 #c7b8a7;
+  color: var(--color-brand-plum);
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.05s;
+  user-select: none;
+}
+
+.retro-btn:hover {
+  background-color: #f5e9d9;
+}
+
+.retro-btn:active {
+  box-shadow: 
+    inset 1.5px 1.5px 0 0 #c7b8a7,
+    inset -1.5px -1.5px 0 0 var(--color-brand-white);
+  padding: 7px 11px 5px 13px; /* visual push feedback */
+}
+
+.retro-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Retro Window Close Button (Decorative/Active) */
+.retro-close-btn {
+  width: 16px;
+  height: 16px;
+  background-color: var(--color-brand-cream);
+  border: 1.5px solid var(--color-brand-plum);
+  box-shadow: 
+    inset 1px 1px 0 0 var(--color-brand-white),
+    inset -1px -1px 0 0 #c7b8a7;
+  color: var(--color-brand-plum);
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 10;
+}
+
+.retro-close-btn:active {
+  box-shadow: 
+    inset 1px 1px 0 0 #c7b8a7,
+    inset -1px -1px 0 0 var(--color-brand-white);
+}
+
+/* --- Cozy Cat Ear Animations --- */
+@keyframes earTwitchLeft {
+  0%, 90%, 100% {
+    transform: rotate(0deg);
+  }
+  92% {
+    transform: rotate(-5deg) translateY(-0.5px);
+  }
+  95% {
+    transform: rotate(3deg) translateY(0.5px);
+  }
+}
+
+@keyframes earTwitchRight {
+  0%, 90%, 100% {
+    transform: rotate(0deg);
+  }
+  92% {
+    transform: rotate(5deg) translateY(-0.5px);
+  }
+  95% {
+    transform: rotate(-3deg) translateY(0.5px);
+  }
+}
+
+.animate-ear-left {
+  animation: earTwitchLeft 6s ease-in-out infinite;
+  transform-origin: bottom right;
+}
+
+.animate-ear-right {
+  animation: earTwitchRight 6s ease-in-out infinite;
+  transform-origin: bottom left;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #ebdcb0;
+  background-image: radial-gradient(var(--color-brand-plum) 1px, transparent 1px);
+  background-size: 4px 4px;
+  border-left: 2px solid var(--color-brand-plum);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-brand-cream);
+  border: 2px solid var(--color-brand-plum);
+  box-shadow: 
+    inset 1px 1px 0 0 var(--color-brand-white),
+    inset -1px -1px 0 0 #c7b8a7;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #f5e9d9;
+}

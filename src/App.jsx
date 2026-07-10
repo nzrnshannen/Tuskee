@@ -195,8 +195,8 @@ export default function App() {
             activeDate={activeDate}
           />
 
-          {/* Bottom Row: Split Grid Layout */}
-          <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
+          {/* Bottom Row: 70/30 Split Grid Layout */}
+          <div className="flex-grow grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-6 min-h-0">
             
             {/* Left Column: Task Checklist Manager */}
             <TodoSection 

@@ -171,7 +171,7 @@ export const PixelCatEars = () => (
     {/* Left Ear */}
     <svg 
       viewBox="0 0 16 12" 
-      className="absolute -top-[11.5px] left-4 w-5 h-[12px] z-10 animate-ear-left"
+      className="absolute -top-[11.5px] left-4 w-5 h-[12px] z-10 animate-ear-left overflow-visible"
       style={{ imageRendering: 'pixelated' }}
     >
       <path d="M 0 12 L 4 4 L 8 0 L 12 4 L 16 12 Z" fill="#3E2312" />
@@ -180,7 +180,7 @@ export const PixelCatEars = () => (
     {/* Right Ear */}
     <svg 
       viewBox="0 0 16 12" 
-      className="absolute -top-[11.5px] right-4 w-5 h-[12px] z-10 animate-ear-right"
+      className="absolute -top-[11.5px] right-4 w-5 h-[12px] z-10 animate-ear-right overflow-visible"
       style={{ imageRendering: 'pixelated' }}
     >
       <path d="M 0 12 L 4 4 L 8 0 L 12 4 L 16 12 Z" fill="#3E2312" />

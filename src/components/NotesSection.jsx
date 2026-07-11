@@ -33,7 +33,7 @@ export default function NotesSection({ notes, onNotesChange, activeDate }) {
   };
 
   return (
-    <section className="retro-window w-full flex flex-col mb-4 select-none">
+    <section className="retro-window w-full flex flex-col mt-8 mb-4 select-none">
       {/* Title Bar */}
       <div className="retro-window-header bg-[#D2E4D6] text-brand-plum">
         <PixelCatEars />

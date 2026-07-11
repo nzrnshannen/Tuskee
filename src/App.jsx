@@ -5,13 +5,21 @@ import TodoSection from './components/TodoSection';
 import CozyJukebox from './components/CozyJukebox';
 import FocusTimer from './components/FocusTimer';
 import CalendarModal from './components/CalendarModal';
+import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import './App.css';
 
 export default function App() {
   // Global Active Date Key (YYYY-MM-DD)
-  const [activeDate, setActiveDate] = useState('2026-07-11');
+  const [activeDate, setActiveDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [showTimeUpModal, setShowTimeUpModal] = useState(false);
+
+  useEffect(() => {
+    setupGlobalClickSound();
+  }, []);
 
   // Focus timer duration state (default 25 minutes, editable)
   const [focusMinutes, setFocusMinutes] = useState(25);
@@ -52,7 +60,8 @@ export default function App() {
         setTimerSeconds((prev) => {
           if (prev <= 1) {
             setTimerRunning(false);
-            alert("⏰ Focus session complete! Take a cozy stretch break. 🍓");
+            import('./utils/audio').then(({ playAlarmSound }) => playAlarmSound());
+            setShowTimeUpModal(true);
             return focusMinutes * 60; // Reset to user configured custom minutes
           }
           return prev - 1;
@@ -171,6 +180,20 @@ export default function App() {
     saveRecords(updatedRecords);
   };
 
+  const handleRestoreTodo = (todo, index) => {
+    const currentTodos = [...(activeRecord.todos || [])];
+    currentTodos.splice(index, 0, todo);
+    
+    const updatedRecords = {
+      ...records,
+      [activeDate]: {
+        ...activeRecord,
+        todos: currentTodos
+      }
+    };
+    saveRecords(updatedRecords);
+  };
+
   const handleEditTodo = (todoId, newText) => {
     const updatedTodos = (activeRecord.todos || []).map(todo => {
       if (todo.id === todoId) {
@@ -190,10 +213,15 @@ export default function App() {
   };
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center p-6 bg-brand-pink select-none overflow-hidden">
+    <div className="min-h-screen w-full flex items-start justify-center py-12 px-6 bg-brand-pink select-none">
       
+      {/* Dynamic Background Pattern */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[-1]" 
+           style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M54.627 0l.83.83v58.34h-58.34l-.83-.83V0h58.34zM29.585 18.06c-2.316-.2-5.74-.24-8.736.9-2.996 1.14-5.992 4.28-7.04 8.04-1.049 3.76-.749 6.8-.299 8.64.449 1.84 2.546 5.8 7.339 6.4 4.793.6 8.986-1.6 11.233-4.2 2.247-2.6 3.445-6.8 3.595-10.4.15-3.6-1.648-7.2-4.194-8.6-2.546-1.4-4.644-1.1-6.892-1.1z\' fill=\'%233E2312\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")' }} 
+      />
+
       {/* Master Notebook Centered Container Panel */}
-      <main className="retro-window max-w-[1300px] w-full h-[88vh] flex flex-col">
+      <main className="retro-window max-w-[1300px] w-full flex flex-col relative">
         
         {/* Cat-Eared Header Container for Unified Navigation */}
         <Header 
@@ -203,8 +231,8 @@ export default function App() {
           onOpenCalendar={() => setCalendarOpen(true)}
         />
 
-        {/* Scrollable Journal Sheets Area */}
-        <div className="flex-grow p-6 flex flex-col gap-6 overflow-hidden bg-brand-pinklight/20">
+        {/* Journal Sheets Area */}
+        <div className="flex-grow pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20">
           
           {/* Top Row: Daily Notes Notepad (Full Width) */}
           <NotesSection 
@@ -217,16 +245,19 @@ export default function App() {
           <div className="flex-grow grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-6 min-h-0">
             
             {/* Left Column: Task Checklist Manager */}
-            <TodoSection 
-              todos={activeRecord.todos || []}
-              onAddTodo={handleAddTodo}
-              onToggleTodo={handleToggleTodo}
-              onDeleteTodo={handleDeleteTodo}
-              onEditTodo={handleEditTodo}
-            />
+            <div className="min-w-0 h-full">
+              <TodoSection 
+                todos={activeRecord.todos || []}
+                onAddTodo={handleAddTodo}
+                onToggleTodo={handleToggleTodo}
+                onDeleteTodo={handleDeleteTodo}
+                onEditTodo={handleEditTodo}
+                onRestoreTodo={handleRestoreTodo}
+              />
+            </div>
 
             {/* Right Column: stacked Spotify Media Player and countdown clock */}
-            <div className="flex flex-col gap-6 h-full min-h-0">
+            <div className="flex flex-col gap-6 h-full min-h-0 min-w-0">
               
               <CozyJukebox className="flex-grow min-h-0" />
 
@@ -254,6 +285,30 @@ export default function App() {
           onClose={() => setCalendarOpen(false)}
           records={records}
         />
+      )}
+
+      {/* Time's Up Modal */}
+      {showTimeUpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+          <div 
+            className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-4 text-center animate-bounce-short shadow-2xl"
+            style={{ paddingTop: '3rem', paddingBottom: '1.5rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', backgroundColor: '#FFFBF5' }}
+          >
+            <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>
+              <span className="text-5xl leading-none" style={{ display: 'inline-block' }}>⏰</span>
+            </div>
+            <h2 className="font-pixel text-brand-plum text-lg leading-tight">Time's Up!</h2>
+            <p className="text-brand-plum/80 font-medium text-sm">Focus session complete! Take a cozy stretch break. 🍓</p>
+            <div className="w-full mt-4">
+              <button 
+                className="retro-btn px-8 py-2 w-full text-xs font-pixel tracking-wider"
+                onClick={() => setShowTimeUpModal(false)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

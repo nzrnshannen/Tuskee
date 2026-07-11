@@ -5,12 +5,12 @@ export default function CozyJukebox({ className = "" }) {
   const spotifyEmbedUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DWWQRwui0ExPn";
 
   return (
-    <div className={`retro-window w-full flex flex-col select-none ${className}`}>
+    <div className={`retro-window w-full flex flex-col select-none h-full bg-[#E5D7C5] ${className}`}>
       {/* Title Bar */}
       <div className="retro-window-header bg-[#CBE3F8] text-brand-plum">
         <PixelCatEars />
         <div className="retro-window-title">
-          <span>📻 MeowPlayer.mp3 - Player</span>
+          <span>MeowPlayer.mp3 - Player</span>
         </div>
       </div>
 

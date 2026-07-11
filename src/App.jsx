@@ -5,6 +5,7 @@ import TodoSection from './components/TodoSection';
 import CozyJukebox from './components/CozyJukebox';
 import FocusTimer from './components/FocusTimer';
 import Calculator from './components/Calculator';
+import Arcade from './components/Arcade';
 import CalendarModal from './components/CalendarModal';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
@@ -305,14 +306,10 @@ export default function App() {
           </div>
         )}
 
-        {/* Games Placeholder */}
+        {/* Arcade Games */}
         {activeApp === 'games' && (
-          <div className="flex-grow flex items-center justify-center p-6 bg-brand-pinklight/20 h-full">
-            <div className="text-brand-plum text-center flex flex-col items-center gap-4">
-              <span className="text-6xl drop-shadow-sm">🎮</span>
-              <h2 className="font-pixel text-xl tracking-wider">Games Arcade</h2>
-              <p className="text-sm font-medium opacity-80">Games app placeholder setup successfully.</p>
-            </div>
+          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-12 bg-brand-pinklight/20 min-h-0 h-full w-full">
+            <Arcade />
           </div>
         )}
 

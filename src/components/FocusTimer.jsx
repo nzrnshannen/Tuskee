@@ -6,7 +6,8 @@ export default function FocusTimer({
   isRunning, 
   onToggleStart, 
   onReset,
-  onTimeChange
+  onTimeChange,
+  className = ""
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempMinutes, setTempMinutes] = useState('25');
@@ -49,7 +50,7 @@ export default function FocusTimer({
   };
 
   return (
-    <div className="retro-window w-full flex flex-col select-none">
+    <div className={`retro-window w-full flex flex-col select-none ${className}`}>
       {/* Title Bar */}
       <div className="retro-window-header bg-[#F5D6D8] text-brand-plum">
         <PixelCatEars />
@@ -59,7 +60,7 @@ export default function FocusTimer({
       </div>
 
       {/* 3-Column Body: Hourglass | Timer | Controls */}
-      <div className="px-6 py-5 flex items-center gap-5 bg-[#FFFDF9]">
+      <div className="px-3 sm:px-6 py-5 flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-5 bg-[#FFFDF9]">
 
         {/* Left: Framed Hourglass */}
         <div className="shrink-0 w-14 h-14 bg-[#FDF6EB] border-2 border-[#7d6972]/40 flex items-center justify-center shadow-inner rounded-sm">

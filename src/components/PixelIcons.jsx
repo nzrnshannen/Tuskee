@@ -171,7 +171,7 @@ export const PixelCatEars = () => (
     {/* Left Ear */}
     <svg 
       viewBox="0 0 16 12" 
-      className="absolute -top-[11.5px] left-4 w-5 h-[12px] z-10 animate-ear-left"
+      className="absolute -top-[11.5px] left-4 w-5 h-[12px] z-10 animate-ear-left overflow-visible"
       style={{ imageRendering: 'pixelated' }}
     >
       <path d="M 0 12 L 4 4 L 8 0 L 12 4 L 16 12 Z" fill="#3E2312" />
@@ -180,11 +180,19 @@ export const PixelCatEars = () => (
     {/* Right Ear */}
     <svg 
       viewBox="0 0 16 12" 
-      className="absolute -top-[11.5px] right-4 w-5 h-[12px] z-10 animate-ear-right"
+      className="absolute -top-[11.5px] right-4 w-5 h-[12px] z-10 animate-ear-right overflow-visible"
       style={{ imageRendering: 'pixelated' }}
     >
       <path d="M 0 12 L 4 4 L 8 0 L 12 4 L 16 12 Z" fill="#3E2312" />
       <path d="M 3 12 L 6 6 L 8 4 L 10 6 L 13 12 Z" fill="#FFA5A5" />
     </svg>
   </>
+);
+
+// 6. Pixel Pencil (Edit icon for todos)
+export const PixelPencil = ({ className = "" }) => (
+  <svg viewBox="0 0 16 16" width="14" height="14" className={className} fill="none" stroke="#3E2312" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z" fill="#FFD05B" stroke="#3E2312" />
+    <line x1="9" y1="4" x2="12" y2="7" />
+  </svg>
 );

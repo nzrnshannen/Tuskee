@@ -188,3 +188,11 @@ export const PixelCatEars = () => (
     </svg>
   </>
 );
+
+// 6. Pixel Pencil (Edit icon for todos)
+export const PixelPencil = ({ className = "" }) => (
+  <svg viewBox="0 0 16 16" width="14" height="14" className={className} fill="none" stroke="#3E2312" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z" fill="#FFD05B" stroke="#3E2312" />
+    <line x1="9" y1="4" x2="12" y2="7" />
+  </svg>
+);

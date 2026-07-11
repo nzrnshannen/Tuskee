@@ -97,7 +97,7 @@ export default function CalendarModal({ activeDate, onSelectDate, onClose, recor
         {/* Title Bar */}
         <div className="retro-window-header bg-brand-cream text-brand-plum">
           <div className="retro-window-title">
-            <span>📅 CALENDAR.EXE</span>
+            <span>CALENDAR.EXE</span>
           </div>
           <button className="retro-close-btn" onClick={onClose}>×</button>
         </div>

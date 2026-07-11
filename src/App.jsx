@@ -171,6 +171,24 @@ export default function App() {
     saveRecords(updatedRecords);
   };
 
+  const handleEditTodo = (todoId, newText) => {
+    const updatedTodos = (activeRecord.todos || []).map(todo => {
+      if (todo.id === todoId) {
+        return { ...todo, text: newText };
+      }
+      return todo;
+    });
+
+    const updatedRecords = {
+      ...records,
+      [activeDate]: {
+        ...activeRecord,
+        todos: updatedTodos
+      }
+    };
+    saveRecords(updatedRecords);
+  };
+
   return (
     <div className="w-screen h-screen flex items-center justify-center p-6 bg-brand-pink select-none overflow-hidden">
       
@@ -204,6 +222,7 @@ export default function App() {
               onAddTodo={handleAddTodo}
               onToggleTodo={handleToggleTodo}
               onDeleteTodo={handleDeleteTodo}
+              onEditTodo={handleEditTodo}
             />
 
             {/* Right Column: stacked Spotify Media Player and countdown clock */}

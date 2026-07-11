@@ -20,7 +20,7 @@ export default function Header({ activeDate, onPrevDay, onNextDay, onOpenCalenda
       
       {/* Left Side: System/App title */}
       <div className="retro-window-title flex items-center gap-2 select-none">
-        <span>🐱 TUSKEE MEOW-STATION</span>
+        <span>TUSKEE MEOW-STATION</span>
       </div>
 
       {/* Center: Consolidated Navigation Ticker */}
@@ -40,7 +40,7 @@ export default function Header({ activeDate, onPrevDay, onNextDay, onOpenCalenda
           title="Open Calendar Modal"
           aria-label="Open Calendar Modal"
         >
-          📅 {formatHeaderDate(activeDate)}
+          {formatHeaderDate(activeDate)}
         </button>
 
         <button 

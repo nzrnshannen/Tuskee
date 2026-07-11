@@ -9,11 +9,29 @@ import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import './App.css';
 
+// --- Global Desktop Dock Icon Component ---
+const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
+  return (
+    <button 
+      onClick={onClick}
+      className={`group flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 border-2 ${
+        isActive 
+          ? 'bg-brand-plum border-brand-plum text-brand-white shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]' 
+          : 'bg-brand-white/40 border-brand-plum/10 hover:bg-brand-white/80 hover:border-brand-plum/30 text-brand-plum shadow-sm'
+      }`}
+      title={label}
+    >
+      <span className="text-xl drop-shadow-sm group-hover:scale-110 transition-transform">{emoji}</span>
+    </button>
+  );
+};
+
 export default function App() {
   // Global Active Date Key (YYYY-MM-DD)
   const [activeDate, setActiveDate] = useState(
     new Date().toISOString().split('T')[0]
   );
+  const [activeApp, setActiveApp] = useState('notebook');
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [showTimeUpModal, setShowTimeUpModal] = useState(false);
 
@@ -213,7 +231,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-start justify-center py-12 px-6 bg-brand-pink select-none">
+    <div className="h-screen w-screen overflow-hidden flex flex-col items-center justify-between pb-6 pt-12 px-6 bg-brand-pink select-none">
       
       {/* Dynamic Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[-1]" 
@@ -221,18 +239,20 @@ export default function App() {
       />
 
       {/* Master Notebook Centered Container Panel */}
-      <main className="retro-window max-w-[1300px] w-full flex flex-col relative">
+      <main className="retro-window max-w-[1300px] w-full flex-grow min-h-0 flex flex-col relative">
         
-        {/* Cat-Eared Header Container for Unified Navigation */}
-        <Header 
-          activeDate={activeDate}
-          onPrevDay={handlePrevDay}
-          onNextDay={handleNextDay}
-          onOpenCalendar={() => setCalendarOpen(true)}
-        />
+        {activeApp === 'notebook' && (
+          <>
+            {/* Cat-Eared Header Container for Unified Navigation */}
+            <Header 
+              activeDate={activeDate}
+              onPrevDay={handlePrevDay}
+              onNextDay={handleNextDay}
+              onOpenCalendar={() => setCalendarOpen(true)}
+            />
 
-        {/* Journal Sheets Area */}
-        <div className="flex-grow pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20">
+            {/* Journal Sheets Area */}
+            <div className="flex-grow min-h-0 pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20 overflow-y-auto">
           
           {/* Top Row: Daily Notes Notepad (Full Width) */}
           <NotesSection 
@@ -274,8 +294,50 @@ export default function App() {
           </div>
 
         </div>
+          </>
+        )}
 
+        {/* Calculator Placeholder */}
+        {activeApp === 'calculator' && (
+          <div className="flex-grow flex items-center justify-center p-6 bg-brand-pinklight/20 h-full">
+            <div className="text-brand-plum text-center flex flex-col items-center gap-4">
+              <span className="text-6xl drop-shadow-sm">🧮</span>
+              <h2 className="font-pixel text-xl tracking-wider">Calculator</h2>
+              <p className="text-sm font-medium opacity-80">Calculator app placeholder setup successfully.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Games Placeholder */}
+        {activeApp === 'games' && (
+          <div className="flex-grow flex items-center justify-center p-6 bg-brand-pinklight/20 h-full">
+            <div className="text-brand-plum text-center flex flex-col items-center gap-4">
+              <span className="text-6xl drop-shadow-sm">🎮</span>
+              <h2 className="font-pixel text-xl tracking-wider">Games Arcade</h2>
+              <p className="text-sm font-medium opacity-80">Games app placeholder setup successfully.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Settings Placeholder */}
+        {activeApp === 'settings' && (
+          <div className="flex-grow flex items-center justify-center p-6 bg-brand-pinklight/20 h-full">
+            <div className="text-brand-plum text-center flex flex-col items-center gap-4">
+              <span className="text-6xl drop-shadow-sm">⚙️</span>
+              <h2 className="font-pixel text-xl tracking-wider">System Settings</h2>
+              <p className="text-sm font-medium opacity-80">Settings app placeholder setup successfully.</p>
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* Bottom Navigation Dock */}
+      <aside className="flex flex-row gap-4 mt-2 mb-8">
+        <DesktopIcon emoji="📓" label="Notebook" isActive={activeApp === 'notebook'} onClick={() => setActiveApp('notebook')} />
+        <DesktopIcon emoji="🧮" label="Calculator" isActive={activeApp === 'calculator'} onClick={() => setActiveApp('calculator')} />
+        <DesktopIcon emoji="🎮" label="Games" isActive={activeApp === 'games'} onClick={() => setActiveApp('games')} />
+        <DesktopIcon emoji="⚙️" label="Settings" isActive={activeApp === 'settings'} onClick={() => setActiveApp('settings')} />
+      </aside>
 
       {/* Calendar Navigation Modal Popup */}
       {calendarOpen && (

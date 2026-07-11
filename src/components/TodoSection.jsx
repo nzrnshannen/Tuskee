@@ -6,10 +6,14 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [deletedTasksStack, setDeletedTasksStack] = useState([]);
+  const [showEmptyTaskModal, setShowEmptyTaskModal] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!newTodoText.trim()) return;
+    if (!newTodoText.trim()) {
+      setShowEmptyTaskModal(true);
+      return;
+    }
     onAddTodo(newTodoText.trim());
     setNewTodoText('');
   };
@@ -167,6 +171,32 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
           + ADD
         </button>
       </form>
+
+      {/* Empty Task Validation Modal */}
+      {showEmptyTaskModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+          <div 
+            className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-4 text-center shadow-2xl"
+            style={{ paddingTop: '2rem', paddingBottom: '1.5rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', backgroundColor: '#FFFBF5' }}
+          >
+            <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+              <span className="text-5xl leading-none" style={{ display: 'inline-block' }}>📝</span>
+            </div>
+            <h2 className="font-pixel text-brand-plum text-sm leading-tight">Oops!</h2>
+            <p className="text-brand-plum/80 font-medium text-xs">
+              Please enter a task!
+            </p>
+            <div className="w-full mt-4 flex gap-4">
+              <button 
+                className="retro-btn px-4 py-2 w-full text-[10px] font-pixel tracking-wider"
+                onClick={() => setShowEmptyTaskModal(false)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

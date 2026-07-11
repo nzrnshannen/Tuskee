@@ -27,12 +27,12 @@ export default function Header({ activeDate, onPrevDay, onNextDay, onOpenCalenda
       {/* Center: Consolidated Navigation Ticker */}
       <div className="flex items-center gap-2">
         <button 
-          className="retro-btn w-6 h-6 flex items-center justify-center p-0 text-[8px]" 
+          className="retro-btn w-6 h-6 flex items-center justify-center p-0 text-[8px] font-pixel pb-[2px]" 
           onClick={onPrevDay}
           title="Previous Day"
           aria-label="Previous Day"
         >
-          ←
+          ◄
         </button>
         
         <button 
@@ -45,12 +45,12 @@ export default function Header({ activeDate, onPrevDay, onNextDay, onOpenCalenda
         </button>
 
         <button 
-          className="retro-btn w-6 h-6 flex items-center justify-center p-0 text-[8px]" 
+          className="retro-btn w-6 h-6 flex items-center justify-center p-0 text-[8px] font-pixel pb-[2px] pl-[2px]" 
           onClick={onNextDay}
           title="Next Day"
           aria-label="Next Day"
         >
-          →
+          ►
         </button>
       </div>
 

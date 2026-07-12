@@ -36,13 +36,15 @@ export default function Snake() {
     setIsPaused(false);
   };
 
-  const checkCollision = (head) => {
+  const checkCollision = (head, currentSnake) => {
     // Wall collision
     if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
       return true;
     }
     // Self collision
-    for (let segment of snake) {
+    // Skip the head (index 0) to prevent instant self-collision
+    const body = currentSnake.slice(1);
+    for (let segment of body) {
       if (head.x === segment.x && head.y === segment.y) {
         return true;
       }
@@ -60,7 +62,7 @@ export default function Snake() {
         y: head.y + currentDirectionRef.current.y
       };
 
-      if (checkCollision(newHead)) {
+      if (checkCollision(newHead, prevSnake)) {
         setIsGameOver(true);
         return prevSnake;
       }
@@ -124,7 +126,7 @@ export default function Snake() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isGameOver]);
+  }, [isGameOver, hasStarted]);
 
   useEffect(() => {
     if (!hasStarted) return;
@@ -190,21 +192,21 @@ export default function Snake() {
         {/* Start / Game Over Overlay */}
         {(!hasStarted || isGameOver) && (
           <div className="absolute inset-0 bg-brand-pinklight/90 backdrop-blur-sm flex flex-col items-center justify-center gap-6 z-20">
-            <h2 className={`font-pixel text-4xl animate-bounce drop-shadow-md ${isGameOver ? 'text-red-600' : 'text-brand-plum'}`}>
-              {isGameOver ? 'GAME OVER!' : 'SNAKE'}
+            <h2 className={`w-full text-center font-pixel text-4xl animate-bounce drop-shadow-md ${isGameOver ? 'text-red-600' : 'text-brand-plum'}`}>
+              {isGameOver ? 'GAME OVER!' : 'Snake Game'}
             </h2>
+            {isGameOver && (
+              <span className="font-pixel text-[10px] text-brand-plum/70 mt-2 mb-2">Final Score: {score}</span>
+            )}
             <button
               onClick={() => {
                 if (isGameOver) resetGame();
                 setHasStarted(true);
               }}
-              className="retro-btn bg-[#D2E4D6] text-brand-plum w-32 h-12 flex items-center justify-center rounded-sm font-pixel text-lg border-4 border-brand-plum shadow-[4px_4px_0px_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0px_0px_0px_rgba(0,0,0,0.2)] hover:bg-[#b8d4be] transition-all"
+              className="retro-btn bg-[#D2E4D6] hover:bg-[#a6cca0] text-brand-plum w-32 h-12 flex items-center justify-center rounded-sm font-pixel text-lg border-4 border-brand-plum shadow-[4px_4px_0px_rgba(0,0,0,0.3)] active:translate-y-[4px] active:shadow-none hover:-translate-y-[1px] transition-all"
             >
               {isGameOver ? 'RETRY' : 'PLAY'}
             </button>
-            {isGameOver && (
-              <span className="font-pixel text-[10px] text-brand-plum/70 mt-2">Final Score: {score}</span>
-            )}
           </div>
         )}
       </div>

@@ -33,7 +33,7 @@ export default function NotesSection({ notes, onNotesChange, activeDate }) {
   };
 
   return (
-    <section className="retro-window w-full flex flex-col mt-8 mb-4 select-none">
+    <section className="retro-window w-full flex flex-col select-none flex-grow">
       {/* Title Bar */}
       <div className="retro-window-header bg-[#D2E4D6] text-brand-plum">
         <PixelCatEars />
@@ -44,7 +44,7 @@ export default function NotesSection({ notes, onNotesChange, activeDate }) {
 
       {/* Notepad body */}
       <textarea
-        className="w-full min-h-[110px] text-brand-plum bg-[#FFFDF9] border-t-2 border-[#7d6972]/30 outline-none resize-y text-sm font-cozy leading-[1.8]"
+        className="w-full min-h-[110px] flex-grow text-brand-plum bg-[#FFFDF9] border-t-2 border-[#7d6972]/30 outline-none resize-none text-sm font-cozy leading-[1.8]"
         style={{ paddingLeft: '28px', paddingRight: '24px', paddingTop: '24px', paddingBottom: '24px' }}
         value={localNotes}
         onChange={handleChange}

@@ -83,7 +83,7 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
       </div>
 
       {/* Task List container */}
-      <div className="flex-grow px-6 pt-4 pb-4 overflow-y-auto flex flex-col gap-2 max-h-[300px]">
+      <div className="flex-grow px-6 pt-4 pb-4 overflow-y-auto flex flex-col gap-2 min-h-0">
         {todos.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8">
             <span style={{ fontSize: '2rem', marginBottom: '4px' }}>📁</span>

@@ -20,8 +20,8 @@ export default function CozyJukebox({ className = "" }) {
       </div>
 
       {/* Spotify iframe player block */}
-      <div className="px-6 pb-6 pt-3 bg-brand-plum/5 flex-grow flex flex-col min-h-0">
-        <div className="border-2 border-brand-plum overflow-hidden shadow-inner flex-grow flex flex-col h-full min-h-0">
+      <div className="px-6 pb-6 pt-3 bg-brand-plum/5 flex-grow flex flex-col">
+        <div className="border-2 border-brand-plum overflow-hidden shadow-inner flex-grow flex flex-col h-full">
           <iframe
             src={spotifyEmbedUrl}
             width="100%"

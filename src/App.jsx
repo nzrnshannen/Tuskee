@@ -242,7 +242,7 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col items-center justify-between pb-6 pt-12 px-6 bg-brand-pink select-none">
+    <div className="min-h-screen w-screen flex flex-col items-center justify-between pb-6 pt-12 px-6 bg-brand-pink select-none overflow-x-hidden">
       
       {/* Dynamic Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[-1]" 
@@ -250,7 +250,7 @@ export default function App() {
       />
 
       {/* Master Notebook Centered Container Panel */}
-      <main className="retro-window max-w-[1300px] w-full flex-grow min-h-0 flex flex-col relative">
+      <main className="retro-window max-w-[1300px] w-full flex-grow flex flex-col relative">
         
         {activeApp === 'notebook' && (
           <>
@@ -263,7 +263,7 @@ export default function App() {
             />
 
             {/* Journal Sheets Area */}
-            <div className="flex-grow min-h-0 pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20 overflow-y-auto">
+            <div className="flex-grow pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20">
           
           {/* Top Row: Daily Notes Notepad (Full Width) */}
           <NotesSection 
@@ -273,7 +273,7 @@ export default function App() {
           />
 
           {/* Bottom Row: 70/30 Split Grid Layout */}
-          <div className="flex-grow grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-6 min-h-0">
+          <div className="flex-grow grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-6">
             
             {/* Left Column: Task Checklist Manager */}
             <div className="min-w-0 h-full">
@@ -288,9 +288,9 @@ export default function App() {
             </div>
 
             {/* Right Column: stacked Spotify Media Player and countdown clock */}
-            <div className="flex flex-col gap-6 h-full min-h-0 min-w-0">
+            <div className="flex flex-col gap-6 h-full min-w-0">
               
-              <CozyJukebox className="flex-grow min-h-0" />
+              <CozyJukebox className="flex-grow" />
 
               <FocusTimer 
                 secondsLeft={timerSeconds}
@@ -310,14 +310,14 @@ export default function App() {
 
         {/* Calculator */}
         {activeApp === 'calculator' && (
-          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-16 bg-brand-pinklight/20 min-h-0 h-full w-full">
+          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-16 bg-brand-pinklight/20 h-full w-full">
             <Calculator />
           </div>
         )}
 
         {/* Arcade Games */}
         {activeApp === 'games' && (
-          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-12 bg-brand-pinklight/20 min-h-0 h-full w-full">
+          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-12 bg-brand-pinklight/20 h-full w-full">
             <Arcade />
           </div>
         )}

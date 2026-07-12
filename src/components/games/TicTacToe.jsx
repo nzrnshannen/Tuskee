@@ -173,15 +173,14 @@ export default function TicTacToe() {
       </div>
 
       {/* Board */}
-      <div className="grid grid-cols-3 gap-2 bg-brand-plum/20 p-2 rounded-xl shadow-inner w-64 h-64">
+      <div className="grid grid-cols-3 grid-rows-3 gap-2 bg-brand-plum/20 p-2 rounded-xl shadow-inner w-64 h-64">
         {board.map((cell, idx) => (
           <button
             key={idx}
             onClick={() => handleClick(idx)}
             disabled={cell !== null || winner !== null || !xIsNext}
-            className={`flex items-center justify-center text-4xl font-pixel bg-[#FFFBF5] rounded-lg border-b-4 
-              ${cell ? 'border-brand-plum/20 active:translate-y-0 active:border-b-4' : 'border-brand-plum hover:bg-[#D2E4D6] active:translate-y-1 active:border-b-0'} 
-              transition-all ${!xIsNext ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            className={`aspect-square w-full h-full flex items-center justify-center text-4xl font-pixel bg-[#FFFBF5] rounded-lg border-b-4 border-brand-plum transition-all 
+              ${!cell && !winner && xIsNext ? 'hover:bg-[#D2E4D6] active:translate-y-1 active:border-b-0 cursor-pointer' : 'cursor-not-allowed'}`}
           >
             <span className={`${cell === 'X' ? 'text-[#e94560]' : 'text-[#533483]'}`}>
               {cell}

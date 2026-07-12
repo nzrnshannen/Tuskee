@@ -32,20 +32,39 @@ export default function Calculator() {
   const [scientificHistory, setScientificHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [historyTab, setHistoryTab] = useState('normal'); // 'normal' | 'scientific'
+  const [topDisplay, setTopDisplay] = useState('');
+  const [justEvaluated, setJustEvaluated] = useState(false);
 
   const handleInput = (val) => {
-    if (displayValue === '0' || displayValue === 'Error') {
-      setDisplayValue(val);
+    if (justEvaluated) {
+      const isOperator = ['+', '-', '×', '÷', '%', '^'].includes(val);
+      if (isOperator) {
+        setDisplayValue(displayValue + val);
+      } else {
+        setDisplayValue(val);
+      }
+      setTopDisplay('');
+      setJustEvaluated(false);
     } else {
-      setDisplayValue(displayValue + val);
+      if (displayValue === '0' || displayValue === 'Error') {
+        setDisplayValue(val);
+      } else {
+        setDisplayValue(displayValue + val);
+      }
     }
   };
 
   const handleClear = () => {
     setDisplayValue('0');
+    setTopDisplay('');
+    setJustEvaluated(false);
   };
 
   const handleBackspace = () => {
+    if (justEvaluated) {
+      setTopDisplay('');
+      setJustEvaluated(false);
+    }
     if (displayValue === 'Error') {
       setDisplayValue('0');
       return;
@@ -98,7 +117,11 @@ export default function Calculator() {
   };
 
   const handleEqual = () => {
+    if (justEvaluated) return;
     const result = evaluateMath(displayValue);
+    
+    setTopDisplay(displayValue + ' =');
+    
     if (result !== 'Error' && displayValue !== result) {
       if (mode === 'normal') {
         setNormalHistory((prev) => [{ equation: displayValue, result }, ...prev]);
@@ -107,10 +130,13 @@ export default function Calculator() {
       }
     }
     setDisplayValue(result);
+    setJustEvaluated(true);
   };
 
-  const handleHistoryClick = (val) => {
-    setDisplayValue(val);
+  const handleHistoryClick = (item) => {
+    setDisplayValue(item.result);
+    setTopDisplay(item.equation + ' =');
+    setJustEvaluated(true);
     setShowHistory(false);
   };
 
@@ -165,6 +191,12 @@ export default function Calculator() {
             <div className="absolute top-1 left-2 flex items-center gap-2">
               <span className="opacity-30 text-[8px] font-pixel">CASIO-MEOW</span>
             </div>
+            
+            {/* Top Line for History */}
+            <span className="font-pixel text-[10px] text-brand-plum/50 tracking-widest truncate w-full text-right mb-1 min-h-[14px]">
+              {topDisplay}
+            </span>
+
             <span className="font-pixel text-3xl text-brand-plum tracking-widest truncate w-full text-right">
               {displayValue}
             </span>
@@ -280,7 +312,7 @@ export default function Calculator() {
               (historyTab === 'normal' ? normalHistory : scientificHistory).map((item, idx) => (
                 <button 
                   key={idx}
-                  onClick={() => handleHistoryClick(item.result)}
+                  onClick={() => handleHistoryClick(item)}
                   className="text-right p-3 px-4 hover:bg-brand-plum/10 rounded-lg border border-transparent hover:border-brand-plum/20 transition-all flex flex-col items-end gap-2"
                 >
                   <span className="text-[10px] text-brand-plum/60 font-pixel">{item.equation}</span>

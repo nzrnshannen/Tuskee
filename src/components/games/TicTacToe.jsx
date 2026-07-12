@@ -144,11 +144,11 @@ export default function TicTacToe() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-sm">
+    <div className="flex flex-col items-center gap-6 w-full max-w-sm p-4">
       
       {/* Controls */}
-      <div className="flex flex-col items-center gap-2 bg-[#D2E4D6] p-3 rounded-xl border-2 border-brand-plum/30 shadow-sm w-full">
-        <span className="font-pixel text-[10px] uppercase text-brand-plum tracking-widest">Difficulty</span>
+      <div className="flex flex-col items-center gap-3 bg-[#D2E4D6] p-4 rounded-xl border-2 border-brand-plum/30 shadow-sm w-full mb-2">
+        <span className="font-pixel text-xs uppercase text-brand-plum tracking-widest">Difficulty</span>
         <div className="flex gap-2">
           {['easy', 'medium', 'hard'].map((level) => (
             <button
@@ -166,7 +166,7 @@ export default function TicTacToe() {
       </div>
 
       {/* Status */}
-      <div className="font-pixel text-lg text-brand-plum tracking-widest h-6">
+      <div className="font-pixel text-sm sm:text-base text-brand-plum tracking-widest h-6 text-center w-full truncate mb-2">
         {winner 
           ? winner === 'draw' ? "IT'S A DRAW!" : `${winner} WINS!`
           : `${xIsNext ? 'PLAYER (X)' : 'CPU (O)'} TURN`}

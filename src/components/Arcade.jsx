@@ -41,10 +41,8 @@ export default function Arcade() {
       <div className="flex flex-grow min-h-0">
         
         {/* Left Column (30%) - Sidebar */}
-        <div className="w-[30%] min-w-[180px] border-r-2 border-brand-plum bg-brand-pinklight/40 p-4 flex flex-col gap-3 overflow-y-auto">
-          <div className="text-[10px] font-pixel text-brand-plum opacity-70 mt-2 mb-2 uppercase tracking-widest text-center">
-            Game Library
-          </div>
+        <div className="w-[30%] min-w-[180px] border-r-2 border-brand-plum bg-brand-pinklight/40 flex flex-col">
+          <div className="flex flex-col gap-3 overflow-hidden p-4">
           {GAME_LIST.map(game => (
             <button
               key={game.id}
@@ -59,14 +57,15 @@ export default function Arcade() {
               <span className="truncate">{game.name}</span>
             </button>
           ))}
+          </div>
         </div>
 
         {/* Right Column (70%) - Game Stage */}
         <div className="w-[70%] bg-brand-cream/50 p-6 flex flex-col justify-center items-center min-h-0 relative">
           {/* CRT Screen Inset container */}
           <div className="w-full h-full bg-[#d8d8c0] border-4 border-brand-plum shadow-[inset_4px_6px_16px_rgba(0,0,0,0.3)] rounded-xl flex items-center justify-center relative overflow-hidden">
-            <div className="absolute top-2 left-3 opacity-20 text-[10px] font-pixel pointer-events-none">GAME-BOY ADVANCE</div>
-            <div className="w-full h-full flex flex-col items-center justify-center overflow-auto p-4 z-10">
+            <div className="absolute top-4 left-4 opacity-20 text-[10px] font-pixel pointer-events-none">GAME-BOY ADVANCE</div>
+            <div className="w-full h-full flex flex-col items-center justify-center overflow-hidden p-4 z-10">
               {renderActiveGame()}
             </div>
           </div>

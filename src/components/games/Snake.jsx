@@ -137,17 +137,17 @@ export default function Snake() {
   }, [moveSnake, score, hasStarted]);
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full">
+    <div className="flex flex-col items-center gap-6 w-full p-4">
       
       {/* Header Bar */}
-      <div className="flex justify-between w-[300px] bg-[#D2E4D6] p-3 rounded-xl border-2 border-brand-plum/30 shadow-sm">
-        <div className="flex flex-col">
-          <span className="font-pixel text-[8px] text-brand-plum/70">SCORE</span>
-          <span className="font-pixel text-xl text-brand-plum">{score}</span>
+      <div className="flex justify-between items-center w-full max-w-[320px] bg-[#D2E4D6] p-4 rounded-xl border-2 border-brand-plum/30 shadow-sm mb-2">
+        <div className="flex flex-col gap-1">
+          <span className="font-pixel text-[10px] text-brand-plum/70">SCORE</span>
+          <span className="font-pixel text-2xl text-brand-plum leading-none truncate max-w-[120px]">{score}</span>
         </div>
-        <div className="flex flex-col text-right">
-          <span className="font-pixel text-[8px] text-brand-plum/70">STATUS</span>
-          <span className="font-pixel text-sm text-brand-plum uppercase">
+        <div className="flex flex-col items-end gap-1 text-right">
+          <span className="font-pixel text-[10px] text-brand-plum/70">STATUS</span>
+          <span className="font-pixel text-sm sm:text-base text-brand-plum uppercase leading-none truncate max-w-[120px]">
             {!hasStarted ? 'IDLE' : isGameOver ? 'GAME OVER' : isPaused ? 'PAUSED' : 'PLAYING'}
           </span>
         </div>

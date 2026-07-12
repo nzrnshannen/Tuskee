@@ -1,33 +1,9 @@
 import React, { useState, useEffect } from 'react';
-
-// 0 represents empty cell
-const SUDOKU_TEMPLATES = [
-  [
-    [5,3,0,0,7,0,0,0,0],
-    [6,0,0,1,9,5,0,0,0],
-    [0,9,8,0,0,0,0,6,0],
-    [8,0,0,0,6,0,0,0,3],
-    [4,0,0,8,0,3,0,0,1],
-    [7,0,0,0,2,0,0,0,6],
-    [0,6,0,0,0,0,2,8,0],
-    [0,0,0,4,1,9,0,0,5],
-    [0,0,0,0,8,0,0,7,9]
-  ],
-  [
-    [0,0,0,2,6,0,7,0,1],
-    [6,8,0,0,7,0,0,9,0],
-    [1,9,0,0,0,4,5,0,0],
-    [8,2,0,1,0,0,0,4,0],
-    [0,0,4,6,0,2,9,0,0],
-    [0,5,0,0,0,3,0,2,8],
-    [0,0,9,3,0,0,0,7,4],
-    [0,4,0,0,5,0,0,3,6],
-    [7,0,3,0,1,8,0,0,0]
-  ]
-];
+import { generateSudoku } from '../../utils/sudokuGenerator';
 
 export default function Sudoku() {
   const [board, setBoard] = useState([]);
+  const [difficulty, setDifficulty] = useState('easy');
   const [initialBoard, setInitialBoard] = useState([]);
   const [selectedCell, setSelectedCell] = useState(null);
   const [errors, setErrors] = useState([]);
@@ -37,8 +13,8 @@ export default function Sudoku() {
     startNewGame();
   }, []);
 
-  const startNewGame = () => {
-    const template = SUDOKU_TEMPLATES[Math.floor(Math.random() * SUDOKU_TEMPLATES.length)];
+  const startNewGame = (selectedDiff = difficulty) => {
+    const template = generateSudoku(selectedDiff);
     const newBoard = template.map(row => [...row]);
     setBoard(newBoard);
     setInitialBoard(template);
@@ -150,17 +126,46 @@ export default function Sudoku() {
   if (!board.length) return null;
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full">
-      <div className="flex justify-between items-center w-full max-w-[340px] bg-[#D2E4D6] p-3 rounded-xl border-2 border-brand-plum/30 shadow-sm">
-        <span className="font-pixel text-[10px] uppercase text-brand-plum tracking-widest">
-          {isWon ? '🎉 PUZZLE SOLVED!' : 'SUDOKU'}
-        </span>
-        <button
-          onClick={startNewGame}
-          className="retro-btn bg-[#F5D6D8] text-brand-plum px-3 py-1 rounded font-pixel text-[8px] uppercase border border-brand-plum active:translate-y-[1px] transition-all"
-        >
-          New Game
-        </button>
+    <div className="flex flex-col items-center gap-6 w-full p-4">
+      <div className="flex flex-col gap-3 w-full max-w-[340px] bg-[#D2E4D6] p-4 rounded-xl border-2 border-brand-plum/30 shadow-sm mb-2">
+        
+        <div className="flex justify-between items-center w-full px-2">
+          <span className="font-pixel flex items-center leading-none text-[10px] sm:text-xs uppercase text-brand-plum tracking-widest truncate mr-2">
+            {isWon ? '🎉 PUZZLE SOLVED!' : 'SUDOKU'}
+          </span>
+          <button
+            onClick={() => startNewGame()}
+            className="retro-btn bg-[#F5D6D8] text-brand-plum px-3 py-1 rounded font-pixel text-[8px] uppercase border border-brand-plum active:translate-y-[1px] transition-all"
+          >
+            New Game
+          </button>
+        </div>
+
+        <div className="flex gap-2 justify-center mt-1">
+          {['easy', 'medium', 'hard'].map((level) => {
+            const isActive = difficulty === level;
+            let activeBg = 'bg-brand-plum text-brand-white shadow-inner';
+            if (level === 'easy') activeBg = 'bg-[#a6cca0] text-brand-plum border-brand-plum shadow-inner';
+            else if (level === 'medium') activeBg = 'bg-[#f4e094] text-brand-plum border-brand-plum shadow-inner';
+            else if (level === 'hard') activeBg = 'bg-[#e94560] text-brand-white border-brand-plum shadow-inner';
+
+            return (
+              <button
+                key={level}
+                onClick={() => { 
+                  setDifficulty(level); 
+                  startNewGame(level); 
+                }}
+                className={`font-pixel text-[10px] px-3 py-1 rounded border-2 transition-all capitalize
+                  ${isActive 
+                    ? activeBg 
+                    : 'bg-brand-cream text-brand-plum border-brand-plum/20 hover:border-brand-plum'}`}
+              >
+                [ {level} ]
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="bg-[#d8d8c0] border-4 border-brand-plum shadow-[inset_2px_4px_8px_rgba(0,0,0,0.3)] p-2 rounded-xl relative">

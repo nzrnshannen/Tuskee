@@ -7,6 +7,7 @@ import FocusTimer from './components/FocusTimer';
 import Calculator from './components/Calculator';
 import Arcade from './components/Arcade';
 import CalendarModal from './components/CalendarModal';
+import AuthScreens from './components/AuthScreens';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import './App.css';
@@ -29,6 +30,9 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
 };
 
 export default function App() {
+  // Global Authentication State
+  const [authView, setAuthView] = useState('landing'); // 'landing', 'login', 'register', 'dashboard'
+
   // Global Active Date Key (YYYY-MM-DD)
   const [activeDate, setActiveDate] = useState(
     new Date().toISOString().split('T')[0]
@@ -232,6 +236,11 @@ export default function App() {
     saveRecords(updatedRecords);
   };
 
+  // If not logged in, render authentication screens
+  if (authView !== 'dashboard') {
+    return <AuthScreens authView={authView} setAuthView={setAuthView} />;
+  }
+
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col items-center justify-between pb-6 pt-12 px-6 bg-brand-pink select-none">
       
@@ -326,11 +335,15 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation Dock */}
-      <aside className="flex flex-row gap-4 mt-2 mb-8">
+      <aside className="flex flex-row gap-4 mt-2 mb-8 items-center">
         <DesktopIcon emoji="📓" label="Notebook" isActive={activeApp === 'notebook'} onClick={() => setActiveApp('notebook')} />
         <DesktopIcon emoji="🧮" label="Calculator" isActive={activeApp === 'calculator'} onClick={() => setActiveApp('calculator')} />
         <DesktopIcon emoji="🎮" label="Games" isActive={activeApp === 'games'} onClick={() => setActiveApp('games')} />
         <DesktopIcon emoji="⚙️" label="Settings" isActive={activeApp === 'settings'} onClick={() => setActiveApp('settings')} />
+        
+        <div className="w-[2px] h-8 bg-brand-plum/20 rounded-full mx-2"></div>
+        
+        <DesktopIcon emoji="🚪" label="Log Out" isActive={false} onClick={() => setAuthView('landing')} />
       </aside>
 
       {/* Calendar Navigation Modal Popup */}

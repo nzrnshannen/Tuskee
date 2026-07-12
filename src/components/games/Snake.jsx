@@ -21,6 +21,7 @@ export default function Snake() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [score, setScore] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
   
   // Use a ref to track the latest direction to prevent quick double-turn self-collisions
   const currentDirectionRef = useRef(direction);
@@ -89,7 +90,7 @@ export default function Snake() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (isGameOver) return;
+      if (isGameOver || !hasStarted) return;
       
       const { x, y } = currentDirectionRef.current;
       switch (e.key) {
@@ -126,11 +127,12 @@ export default function Snake() {
   }, [isGameOver]);
 
   useEffect(() => {
+    if (!hasStarted) return;
     // Increase speed slightly as score goes up
     const speed = Math.max(50, INITIAL_SPEED - Math.floor(score / 30) * 10);
     const interval = setInterval(moveSnake, speed);
     return () => clearInterval(interval);
-  }, [moveSnake, score]);
+  }, [moveSnake, score, hasStarted]);
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
@@ -144,7 +146,7 @@ export default function Snake() {
         <div className="flex flex-col text-right">
           <span className="font-pixel text-[8px] text-brand-plum/70">STATUS</span>
           <span className="font-pixel text-sm text-brand-plum uppercase">
-            {isGameOver ? 'GAME OVER' : isPaused ? 'PAUSED' : 'PLAYING'}
+            {!hasStarted ? 'IDLE' : isGameOver ? 'GAME OVER' : isPaused ? 'PAUSED' : 'PLAYING'}
           </span>
         </div>
       </div>
@@ -185,16 +187,24 @@ export default function Snake() {
           </div>
         </div>
 
-        {/* Game Over Overlay */}
-        {isGameOver && (
-          <div className="absolute inset-0 bg-brand-pinklight/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-20">
-            <h2 className="font-pixel text-2xl text-red-600 animate-bounce">GAME OVER!</h2>
+        {/* Start / Game Over Overlay */}
+        {(!hasStarted || isGameOver) && (
+          <div className="absolute inset-0 bg-brand-pinklight/90 backdrop-blur-sm flex flex-col items-center justify-center gap-6 z-20">
+            <h2 className={`font-pixel text-4xl animate-bounce drop-shadow-md ${isGameOver ? 'text-red-600' : 'text-brand-plum'}`}>
+              {isGameOver ? 'GAME OVER!' : 'SNAKE'}
+            </h2>
             <button
-              onClick={resetGame}
-              className="retro-btn bg-brand-cream text-brand-plum px-6 py-2 rounded-lg font-pixel text-xs border-2 border-brand-plum shadow-sm hover:-translate-y-1 transition-all"
+              onClick={() => {
+                if (isGameOver) resetGame();
+                setHasStarted(true);
+              }}
+              className="retro-btn bg-[#D2E4D6] text-brand-plum w-32 h-12 flex items-center justify-center rounded-sm font-pixel text-lg border-4 border-brand-plum shadow-[4px_4px_0px_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0px_0px_0px_rgba(0,0,0,0.2)] hover:bg-[#b8d4be] transition-all"
             >
-              PLAY AGAIN
+              {isGameOver ? 'RETRY' : 'PLAY'}
             </button>
+            {isGameOver && (
+              <span className="font-pixel text-[10px] text-brand-plum/70 mt-2">Final Score: {score}</span>
+            )}
           </div>
         )}
       </div>

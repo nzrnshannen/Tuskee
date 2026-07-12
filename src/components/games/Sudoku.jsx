@@ -172,8 +172,8 @@ export default function Sudoku() {
               const isError = errors.includes(`${r},${c}`);
               
               // Borders for 3x3 blocks
-              const borderRight = c % 3 === 2 && c !== 8 ? 'border-r-2 border-brand-plum' : 'border-r border-brand-plum/20';
-              const borderBottom = r % 3 === 2 && r !== 8 ? 'border-b-2 border-brand-plum' : 'border-b border-brand-plum/20';
+              const borderRight = c === 2 || c === 5 ? 'border-r-4 border-brand-plum' : 'border-r border-brand-plum/20';
+              const borderBottom = r === 2 || r === 5 ? 'border-b-4 border-brand-plum' : 'border-b border-brand-plum/20';
 
               return (
                 <div

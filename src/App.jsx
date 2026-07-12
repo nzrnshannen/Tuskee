@@ -40,6 +40,7 @@ export default function App() {
   const [activeApp, setActiveApp] = useState('notebook');
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [showTimeUpModal, setShowTimeUpModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     setupGlobalClickSound();
@@ -236,13 +237,22 @@ export default function App() {
     saveRecords(updatedRecords);
   };
 
+  const handleConfirmLogout = async () => {
+    // Expected programmatic session clearance:
+    // await supabase.auth.signOut();
+    
+    // Clear active UI session and route to landing
+    setShowLogoutModal(false);
+    setAuthView('landing');
+  };
+
   // If not logged in, render authentication screens
   if (authView !== 'dashboard') {
     return <AuthScreens authView={authView} setAuthView={setAuthView} />;
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col items-center justify-between pb-6 pt-12 px-6 bg-brand-pink select-none">
+    <div className="min-h-screen w-screen flex flex-col items-center justify-between pb-6 pt-12 px-6 bg-brand-pink select-none overflow-x-hidden">
       
       {/* Dynamic Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[-1]" 
@@ -250,7 +260,7 @@ export default function App() {
       />
 
       {/* Master Notebook Centered Container Panel */}
-      <main className="retro-window max-w-[1300px] w-full flex-grow min-h-0 flex flex-col relative">
+      <main className="retro-window max-w-[1300px] w-full flex-grow flex flex-col relative">
         
         {activeApp === 'notebook' && (
           <>
@@ -263,7 +273,7 @@ export default function App() {
             />
 
             {/* Journal Sheets Area */}
-            <div className="flex-grow min-h-0 pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20 overflow-y-auto">
+            <div className="flex-grow pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20">
           
           {/* Top Row: Daily Notes Notepad (Full Width) */}
           <NotesSection 
@@ -310,14 +320,14 @@ export default function App() {
 
         {/* Calculator */}
         {activeApp === 'calculator' && (
-          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-16 bg-brand-pinklight/20 min-h-0 h-full w-full">
+          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-16 bg-brand-pinklight/20 h-full w-full">
             <Calculator />
           </div>
         )}
 
         {/* Arcade Games */}
         {activeApp === 'games' && (
-          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-12 bg-brand-pinklight/20 min-h-0 h-full w-full">
+          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-12 bg-brand-pinklight/20 h-full w-full">
             <Arcade />
           </div>
         )}
@@ -343,7 +353,7 @@ export default function App() {
         
         <div className="w-[2px] h-8 bg-brand-plum/20 rounded-full mx-2"></div>
         
-        <DesktopIcon emoji="🚪" label="Log Out" isActive={false} onClick={() => setAuthView('landing')} />
+        <DesktopIcon emoji="🚪" label="Log Out" isActive={false} onClick={() => setShowLogoutModal(true)} />
       </aside>
 
       {/* Calendar Navigation Modal Popup */}
@@ -374,6 +384,37 @@ export default function App() {
                 onClick={() => setShowTimeUpModal(false)}
               >
                 OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Log Out Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+          <div 
+            className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-6 text-center shadow-2xl"
+            style={{ padding: '2rem 1.5rem', backgroundColor: '#FFFBF5' }}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-4xl">🚪</span>
+              <h2 className="font-pixel text-brand-plum text-lg leading-tight mt-2">Log Out?</h2>
+              <p className="text-brand-plum/80 font-medium text-sm">Are you sure you want to end your current session?</p>
+            </div>
+            
+            <div className="w-full flex gap-3 mt-2">
+              <button 
+                className="flex-1 bg-brand-cream/50 text-brand-plum/70 border-2 border-brand-plum/30 py-2.5 font-pixel text-[10px] tracking-wider hover:bg-brand-cream hover:text-brand-plum hover:border-brand-plum transition-colors active:translate-y-[1px]"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                CANCEL
+              </button>
+              <button 
+                className="flex-1 retro-btn bg-[#F5D6D8] text-brand-plum py-2.5 font-pixel text-[10px] tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner hover:bg-[#eecbcd]"
+                onClick={handleConfirmLogout}
+              >
+                LOG OUT
               </button>
             </div>
           </div>

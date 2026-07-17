@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const WIN_LINES = [
   [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
@@ -12,17 +13,22 @@ export default function TicTacToe() {
   const [xIsNext, setXIsNext] = useState(true);
   const [winner, setWinner] = useState(null);
   const [stats, setStats] = useState({ wins: 0, losses: 0, draws: 0 });
+  const { gameStats, updateGameStats } = useAuth();
 
   useEffect(() => {
-    const saved = localStorage.getItem('tuskee_ttt_stats');
-    if (saved) {
-      try {
-        setStats(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse TTT stats');
+    if (gameStats?.ttt_stats) {
+      setStats(gameStats.ttt_stats);
+    } else {
+      const saved = localStorage.getItem('tuskee_ttt_stats');
+      if (saved) {
+        try {
+          setStats(JSON.parse(saved));
+        } catch (e) {
+          console.error('Failed to parse TTT stats');
+        }
       }
     }
-  }, []);
+  }, [gameStats?.ttt_stats]);
 
   useEffect(() => {
     const currentWinner = calculateWinner(board);
@@ -36,6 +42,7 @@ export default function TicTacToe() {
         else if (currentWinner === 'draw') newStats.draws++;
         
         localStorage.setItem('tuskee_ttt_stats', JSON.stringify(newStats));
+        if (updateGameStats) updateGameStats({ ttt_stats: newStats });
         return newStats;
       });
     }

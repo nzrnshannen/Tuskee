@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { PixelCatEars } from './PixelIcons';
+import { useAuth } from '../context/AuthContext';
 
 export default function SettingsPanel({ onBackgroundChange }) {
+  const { profile, updateProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('Profile');
   
   // States for Profile
-  const [bgPattern, setBgPattern] = useState('peach');
+  const [bgPattern, setBgPattern] = useState(profile?.bg_pattern || 'peach');
   
   // States for Security Credentials
   const [currentPassword, setCurrentPassword] = useState('');
@@ -24,8 +26,12 @@ export default function SettingsPanel({ onBackgroundChange }) {
 
   // Load initial settings
   useEffect(() => {
-    const savedBgPattern = localStorage.getItem('tuskee_bg_pattern');
-    if (savedBgPattern) setBgPattern(savedBgPattern);
+    if (profile?.bg_pattern) {
+      setBgPattern(profile.bg_pattern);
+    } else {
+      const savedBgPattern = localStorage.getItem('tuskee_bg_pattern');
+      if (savedBgPattern) setBgPattern(savedBgPattern);
+    }
     
     const savedSoundFx = localStorage.getItem('tuskee_sound_fx');
     if (savedSoundFx !== null) setSoundFx(savedSoundFx === 'true');
@@ -39,6 +45,7 @@ export default function SettingsPanel({ onBackgroundChange }) {
     setBgPattern(patternName);
     localStorage.setItem('tuskee_bg_pattern', patternName);
     if (onBackgroundChange) onBackgroundChange(patternName);
+    if (updateProfile) updateProfile({ bg_pattern: patternName });
   };
 
   const handleUpdatePassword = () => {

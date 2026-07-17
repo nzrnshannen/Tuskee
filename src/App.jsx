@@ -52,6 +52,7 @@ export default function App() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [showTimeUpModal, setShowTimeUpModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showRegistrationSuccess, setShowRegistrationSuccess] = useState(false);
   const [bgPattern, setBgPattern] = useState('peach');
 
   useEffect(() => {
@@ -270,7 +271,7 @@ export default function App() {
 
   // If not logged in, render authentication screens
   if (authView !== 'dashboard') {
-    return <AuthScreens authView={authView} setAuthView={setAuthView} />;
+    return <AuthScreens authView={authView} setAuthView={setAuthView} onRegisterSuccess={() => setShowRegistrationSuccess(true)} />;
   }
 
   const getBgColor = (pattern) => {
@@ -442,6 +443,31 @@ export default function App() {
                 onClick={handleConfirmLogout}
               >
                 LOG OUT
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Success Modal */}
+      {showRegistrationSuccess && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+          <div 
+            className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-6 text-center shadow-2xl bg-[#FFFBF5]"
+            style={{ padding: '2rem 1.5rem' }}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl drop-shadow-sm">🎉</span>
+              <h2 className="font-pixel text-brand-plum text-lg leading-tight mt-2">Account Created!</h2>
+              <p className="text-brand-plum/80 font-medium text-sm">Your account has been successfully created. Welcome to Tuskee!</p>
+            </div>
+            
+            <div className="w-full mt-2">
+              <button 
+                className="w-full retro-btn bg-[#D2E4D6] text-brand-plum py-2.5 font-pixel text-[10px] tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner uppercase"
+                onClick={() => setShowRegistrationSuccess(false)}
+              >
+                OK
               </button>
             </div>
           </div>

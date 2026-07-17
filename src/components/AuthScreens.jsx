@@ -254,16 +254,18 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
   );
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col items-center justify-center p-6 bg-brand-pink select-none relative z-50">
+    <div className="h-screen w-screen overflow-hidden flex flex-col bg-brand-pink select-none relative z-50">
       {/* Dynamic Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0" 
            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M54.627 0l.83.83v58.34h-58.34l-.83-.83V0h58.34zM29.585 18.06c-2.316-.2-5.74-.24-8.736.9-2.996 1.14-5.992 4.28-7.04 8.04-1.049 3.76-.749 6.8-.299 8.64.449 1.84 2.546 5.8 7.339 6.4 4.793.6 8.986-1.6 11.233-4.2 2.247-2.6 3.445-6.8 3.595-10.4.15-3.6-1.648-7.2-4.194-8.6-2.546-1.4-4.644-1.1-6.892-1.1z\' fill=\'%233E2312\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")' }} 
       />
       
-      <div className="z-10 w-full flex justify-center">
-        {authView === 'landing' && renderLanding()}
-        {authView === 'login' && renderLogin()}
-        {authView === 'register' && renderRegister()}
+      <div className="z-10 w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col items-center justify-center p-6">
+        <div className="flex-shrink-0 w-full flex justify-center min-h-[fit-content]">
+          {authView === 'landing' && renderLanding()}
+          {authView === 'login' && renderLogin()}
+          {authView === 'register' && renderRegister()}
+        </div>
       </div>
     </div>
   );

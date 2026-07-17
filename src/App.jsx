@@ -284,7 +284,7 @@ export default function App() {
 
   return (
     <div 
-      className="min-h-screen w-screen flex flex-col items-center justify-between pb-6 pt-12 px-6 select-none overflow-x-hidden transition-colors duration-300"
+      className="h-screen w-screen overflow-hidden flex flex-col select-none transition-colors duration-300"
       style={{ backgroundColor: getBgColor(bgPattern) }}
     >
       
@@ -293,8 +293,11 @@ export default function App() {
            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M54.627 0l.83.83v58.34h-58.34l-.83-.83V0h58.34zM29.585 18.06c-2.316-.2-5.74-.24-8.736.9-2.996 1.14-5.992 4.28-7.04 8.04-1.049 3.76-.749 6.8-.299 8.64.449 1.84 2.546 5.8 7.339 6.4 4.793.6 8.986-1.6 11.233-4.2 2.247-2.6 3.445-6.8 3.595-10.4.15-3.6-1.648-7.2-4.194-8.6-2.546-1.4-4.644-1.1-6.892-1.1z\' fill=\'%233E2312\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")' }} 
       />
 
-      {/* Master Notebook Centered Container Panel */}
-      <main className="retro-window max-w-[1300px] w-full flex-grow flex flex-col relative">
+      {/* Scrollable Main Workspace */}
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden w-full flex flex-col items-center pt-8 px-6 pb-6 relative z-10">
+        
+        {/* Inner Application Window */}
+        <div className="retro-window max-w-[1300px] w-full flex-shrink-0 flex flex-col relative min-h-[fit-content]">
         
         {activeApp === 'notebook' && (
           <>
@@ -370,10 +373,11 @@ export default function App() {
         {activeApp === 'settings' && (
           <SettingsPanel onBackgroundChange={setBgPattern} />
         )}
+        </div>
       </main>
 
       {/* Bottom Navigation Dock */}
-      <aside className="flex flex-row gap-4 mt-2 mb-8 items-center">
+      <aside className="flex-shrink-0 flex flex-row gap-4 pt-2 pb-8 items-center justify-center w-full relative z-10">
         <DesktopIcon emoji="📓" label="Notebook" isActive={activeApp === 'notebook'} onClick={() => setActiveApp('notebook')} />
         <DesktopIcon emoji="🧮" label="Calculator" isActive={activeApp === 'calculator'} onClick={() => setActiveApp('calculator')} />
         <DesktopIcon emoji="🎮" label="Games" isActive={activeApp === 'games'} onClick={() => setActiveApp('games')} />

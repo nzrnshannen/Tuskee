@@ -6,6 +6,7 @@ import CozyJukebox from './components/CozyJukebox';
 import FocusTimer from './components/FocusTimer';
 import Calculator from './components/Calculator';
 import Arcade from './components/Arcade';
+import SettingsPanel from './components/SettingsPanel';
 import CalendarModal from './components/CalendarModal';
 import AuthScreens from './components/AuthScreens';
 import { setupGlobalClickSound } from './utils/audio';
@@ -41,9 +42,14 @@ export default function App() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [showTimeUpModal, setShowTimeUpModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [bgPattern, setBgPattern] = useState('peach');
 
   useEffect(() => {
     setupGlobalClickSound();
+    const savedBgPattern = localStorage.getItem('tuskee_bg_pattern');
+    if (savedBgPattern) {
+      setBgPattern(savedBgPattern);
+    }
   }, []);
 
   // Focus timer duration state (default 25 minutes, editable)
@@ -251,8 +257,19 @@ export default function App() {
     return <AuthScreens authView={authView} setAuthView={setAuthView} />;
   }
 
+  const getBgColor = (pattern) => {
+    switch (pattern) {
+      case 'mint': return '#D2E4D6';
+      case 'cream': return '#FFFBF5';
+      case 'peach': default: return '#FDF6EB';
+    }
+  };
+
   return (
-    <div className="min-h-screen w-screen flex flex-col items-center justify-between pb-6 pt-12 px-6 bg-brand-pink select-none overflow-x-hidden">
+    <div 
+      className="min-h-screen w-screen flex flex-col items-center justify-between pb-6 pt-12 px-6 select-none overflow-x-hidden transition-colors duration-300"
+      style={{ backgroundColor: getBgColor(bgPattern) }}
+    >
       
       {/* Dynamic Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[-1]" 
@@ -332,15 +349,9 @@ export default function App() {
           </div>
         )}
 
-        {/* Settings Placeholder */}
+        {/* Settings Panel */}
         {activeApp === 'settings' && (
-          <div className="flex-grow flex items-center justify-center p-6 bg-brand-pinklight/20 h-full">
-            <div className="text-brand-plum text-center flex flex-col items-center gap-4">
-              <span className="text-6xl drop-shadow-sm">⚙️</span>
-              <h2 className="font-pixel text-xl tracking-wider">System Settings</h2>
-              <p className="text-sm font-medium opacity-80">Settings app placeholder setup successfully.</p>
-            </div>
-          </div>
+          <SettingsPanel onBackgroundChange={setBgPattern} />
         )}
       </main>
 

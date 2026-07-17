@@ -11,6 +11,16 @@ const initAudio = () => {
 };
 
 export const playClickSound = () => {
+  const savedSoundFx = localStorage.getItem('tuskee_sound_fx');
+  if (savedSoundFx === 'false') return;
+  
+  const savedVolume = localStorage.getItem('tuskee_volume');
+  // Default is 50%, so we multiply by (vol / 50) to keep default at 0.4 gain, or better:
+  // We can map 0-100 to a scale where 50 is the normal volume.
+  // Original gain was 0.4. So volumeMultiplier = (vol / 100) * 2. 
+  // If vol=50, mult=1. If vol=100, mult=2.
+  const volumeMultiplier = savedVolume ? (parseInt(savedVolume, 10) / 50) : 1;
+
   try {
     const ctx = initAudio();
     const osc = ctx.createOscillator();
@@ -21,8 +31,8 @@ export const playClickSound = () => {
     osc.frequency.setValueAtTime(1500, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(500, ctx.currentTime + 0.02);
     
-    gainNode.gain.setValueAtTime(0.4, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.02);
+    gainNode.gain.setValueAtTime(0.4 * volumeMultiplier, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, ctx.currentTime + 0.02);
     
     osc.connect(gainNode);
     gainNode.connect(ctx.destination);
@@ -35,6 +45,12 @@ export const playClickSound = () => {
 };
 
 export const playAlarmSound = () => {
+  const savedSoundFx = localStorage.getItem('tuskee_sound_fx');
+  if (savedSoundFx === 'false') return;
+
+  const savedVolume = localStorage.getItem('tuskee_volume');
+  const volumeMultiplier = savedVolume ? (parseInt(savedVolume, 10) / 50) : 1;
+
   try {
     const ctx = initAudio();
     
@@ -51,8 +67,8 @@ export const playAlarmSound = () => {
       osc.frequency.value = freq;
       
       gainNode.gain.setValueAtTime(0, startTime);
-      gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      gainNode.gain.linearRampToValueAtTime(0.2 * volumeMultiplier, startTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + duration);
       
       osc.connect(gainNode);
       gainNode.connect(ctx.destination);

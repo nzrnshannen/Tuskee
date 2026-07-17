@@ -11,6 +11,7 @@ import CalendarModal from './components/CalendarModal';
 import AuthScreens from './components/AuthScreens';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
+import { supabase } from './utils/supabase';
 import './App.css';
 
 // --- Global Desktop Dock Icon Component ---
@@ -33,6 +34,25 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
 export default function App() {
   // Global Authentication State
   const [authView, setAuthView] = useState('landing'); // 'landing', 'login', 'register', 'dashboard'
+  const [session, setSession] = useState(null);
+
+  // Initialize session
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) setAuthView('dashboard');
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) setAuthView('dashboard');
+      else setAuthView('landing');
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Global Active Date Key (YYYY-MM-DD)
   const [activeDate, setActiveDate] = useState(
@@ -244,11 +264,9 @@ export default function App() {
   };
 
   const handleConfirmLogout = async () => {
-    // Expected programmatic session clearance:
-    // await supabase.auth.signOut();
-    
     // Clear active UI session and route to landing
     setShowLogoutModal(false);
+    await supabase.auth.signOut();
     setAuthView('landing');
   };
 

@@ -161,7 +161,7 @@ export default function Sudoku() {
       <div className="flex flex-col gap-3 w-full max-w-[340px] bg-[#D2E4D6] p-4 rounded-xl border-2 border-brand-plum/30 shadow-sm mb-2">
         
         <div className="flex justify-between items-center w-full px-2">
-          <span className="font-pixel flex items-center leading-none text-[10px] sm:text-xs uppercase text-brand-plum tracking-widest truncate mr-2">
+          <span className="font-pixel flex items-center leading-none text-[10px] sm:text-xs uppercase text-brand-plum tracking-widest mr-2 pl-1">
             {isWon ? '🎉 PUZZLE SOLVED!' : 'SUDOKU'}
           </span>
           <button
@@ -172,7 +172,7 @@ export default function Sudoku() {
           </button>
         </div>
 
-        <div className="flex gap-2 justify-center mt-1">
+        <div className="grid grid-cols-3 gap-1 sm:gap-2 mt-1 w-full">
           {['easy', 'medium', 'hard'].map((level) => {
             const isActive = difficulty === level;
             let activeBg = 'bg-brand-plum text-brand-white shadow-inner';
@@ -187,7 +187,7 @@ export default function Sudoku() {
                   setDifficulty(level); 
                   startNewGame(level); 
                 }}
-                className={`font-pixel text-[10px] px-3 py-1 rounded border-2 transition-all capitalize whitespace-nowrap
+                className={`font-pixel text-[9px] sm:text-[10px] py-1 rounded border-2 transition-all capitalize whitespace-nowrap flex items-center justify-center
                   ${isActive 
                     ? activeBg 
                     : 'bg-brand-cream text-brand-plum border-brand-plum/20 hover:border-brand-plum'}`}

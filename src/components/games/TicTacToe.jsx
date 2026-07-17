@@ -11,11 +11,33 @@ export default function TicTacToe() {
   const [difficulty, setDifficulty] = useState('easy'); // 'easy' | 'medium' | 'hard'
   const [xIsNext, setXIsNext] = useState(true);
   const [winner, setWinner] = useState(null);
+  const [stats, setStats] = useState({ wins: 0, losses: 0, draws: 0 });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('tuskee_ttt_stats');
+    if (saved) {
+      try {
+        setStats(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse TTT stats');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const currentWinner = calculateWinner(board);
     if (currentWinner && winner !== currentWinner) {
       setWinner(currentWinner);
+      
+      setStats(prev => {
+        const newStats = { ...prev };
+        if (currentWinner === 'X') newStats.wins++;
+        else if (currentWinner === 'O') newStats.losses++;
+        else if (currentWinner === 'draw') newStats.draws++;
+        
+        localStorage.setItem('tuskee_ttt_stats', JSON.stringify(newStats));
+        return newStats;
+      });
     }
     
     // AI Turn
@@ -162,6 +184,22 @@ export default function TicTacToe() {
               [ {level} ]
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Stats Display */}
+      <div className="flex justify-between w-full bg-[#FFFBF5] border-2 border-brand-plum/20 rounded-lg p-2 px-4 shadow-inner mb-2">
+        <div className="flex flex-col items-center">
+          <span className="font-pixel text-[8px] text-brand-plum/60 uppercase">Wins</span>
+          <span className="font-pixel text-sm text-green-600">{stats.wins}</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="font-pixel text-[8px] text-brand-plum/60 uppercase">Draws</span>
+          <span className="font-pixel text-sm text-brand-plum/80">{stats.draws}</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="font-pixel text-[8px] text-brand-plum/60 uppercase">Losses</span>
+          <span className="font-pixel text-sm text-red-600">{stats.losses}</span>
         </div>
       </div>
 

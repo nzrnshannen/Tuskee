@@ -90,7 +90,9 @@ export default function SettingsPanel({ onBackgroundChange }) {
         localStorage.removeItem('tuskee_records');
         break;
       case 'All Games (High Scores)':
-        localStorage.removeItem('tuskee_games_scores');
+        localStorage.removeItem('tuskee_snake_highscore');
+        localStorage.removeItem('tuskee_ttt_stats');
+        localStorage.removeItem('tuskee_sudoku_best_times');
         break;
       case 'Calculator History':
         localStorage.removeItem('tuskee_calc_history');

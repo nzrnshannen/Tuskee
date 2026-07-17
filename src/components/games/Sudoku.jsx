@@ -8,10 +8,27 @@ export default function Sudoku() {
   const [selectedCell, setSelectedCell] = useState(null);
   const [errors, setErrors] = useState([]);
   const [isWon, setIsWon] = useState(false);
+  const [time, setTime] = useState(0);
+  const [bestTimes, setBestTimes] = useState({ easy: null, medium: null, hard: null });
+  const [isGameActive, setIsGameActive] = useState(false);
 
   useEffect(() => {
+    const saved = localStorage.getItem('tuskee_sudoku_best_times');
+    if (saved) {
+      try {
+        setBestTimes(JSON.parse(saved));
+      } catch(e) {}
+    }
     startNewGame();
   }, []);
+
+  useEffect(() => {
+    let interval;
+    if (isGameActive && !isWon && board.length > 0) {
+      interval = setInterval(() => setTime(t => t + 1), 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isGameActive, isWon, board]);
 
   const startNewGame = (selectedDiff = difficulty) => {
     const template = generateSudoku(selectedDiff);
@@ -21,6 +38,8 @@ export default function Sudoku() {
     setSelectedCell(null);
     setErrors([]);
     setIsWon(false);
+    setTime(0);
+    setIsGameActive(false);
   };
 
   const validateBoard = (currentBoard) => {
@@ -86,7 +105,19 @@ export default function Sudoku() {
           if (currentBoard[r][c] === 0) isFull = false;
         }
       }
-      if (isFull) setIsWon(true);
+      if (isFull) {
+        setIsWon(true);
+        // Check best time
+        setBestTimes(prev => {
+          const currentBest = prev[difficulty];
+          if (currentBest === null || time < currentBest) {
+            const newBest = { ...prev, [difficulty]: time };
+            localStorage.setItem('tuskee_sudoku_best_times', JSON.stringify(newBest));
+            return newBest;
+          }
+          return prev;
+        });
+      }
     } else {
       setIsWon(false);
     }
@@ -100,7 +131,7 @@ export default function Sudoku() {
   };
 
   const handleKeyPress = (e) => {
-    if (!selectedCell || isWon) return;
+    if (!selectedCell || isWon || !isGameActive) return;
 
     const key = e.key;
     if (/^[1-9]$/.test(key)) {
@@ -130,7 +161,7 @@ export default function Sudoku() {
       <div className="flex flex-col gap-3 w-full max-w-[340px] bg-[#D2E4D6] p-4 rounded-xl border-2 border-brand-plum/30 shadow-sm mb-2">
         
         <div className="flex justify-between items-center w-full px-2">
-          <span className="font-pixel flex items-center leading-none text-[10px] sm:text-xs uppercase text-brand-plum tracking-widest truncate mr-2">
+          <span className="font-pixel flex items-center leading-none text-[10px] sm:text-xs uppercase text-brand-plum tracking-widest mr-2 pl-1">
             {isWon ? '🎉 PUZZLE SOLVED!' : 'SUDOKU'}
           </span>
           <button
@@ -141,7 +172,7 @@ export default function Sudoku() {
           </button>
         </div>
 
-        <div className="flex gap-2 justify-center mt-1">
+        <div className="grid grid-cols-3 gap-1 sm:gap-2 mt-1 w-full">
           {['easy', 'medium', 'hard'].map((level) => {
             const isActive = difficulty === level;
             let activeBg = 'bg-brand-plum text-brand-white shadow-inner';
@@ -156,7 +187,7 @@ export default function Sudoku() {
                   setDifficulty(level); 
                   startNewGame(level); 
                 }}
-                className={`font-pixel text-[10px] px-3 py-1 rounded border-2 transition-all capitalize
+                className={`font-pixel text-[9px] sm:text-[10px] py-1 rounded border-2 transition-all capitalize whitespace-nowrap flex items-center justify-center
                   ${isActive 
                     ? activeBg 
                     : 'bg-brand-cream text-brand-plum border-brand-plum/20 hover:border-brand-plum'}`}
@@ -165,6 +196,24 @@ export default function Sudoku() {
               </button>
             );
           })}
+        </div>
+
+        {/* Timer Display */}
+        <div className="flex justify-between items-center w-full mt-2 px-2 border-t border-brand-plum/10 pt-2">
+          <div className="flex flex-col">
+            <span className="font-pixel text-[8px] text-brand-plum/60 uppercase">Time</span>
+            <span className="font-pixel text-sm text-brand-plum">
+              {Math.floor(time / 60).toString().padStart(2, '0')}:{(time % 60).toString().padStart(2, '0')}
+            </span>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-pixel text-[8px] text-brand-plum/60 uppercase">Best ({difficulty})</span>
+            <span className="font-pixel text-sm text-brand-plum">
+              {bestTimes[difficulty] !== null 
+                ? `${Math.floor(bestTimes[difficulty] / 60).toString().padStart(2, '0')}:${(bestTimes[difficulty] % 60).toString().padStart(2, '0')}`
+                : '--:--'}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -198,6 +247,17 @@ export default function Sudoku() {
             })
           ))}
         </div>
+
+        {!isGameActive && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg backdrop-blur-[6px] bg-[#FFFBF5]/40">
+             <button 
+               onClick={() => setIsGameActive(true)}
+               className="retro-btn bg-[#D2E4D6] text-brand-plum px-6 py-3 font-pixel text-sm border-2 border-brand-plum shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:bg-[#a6cca0] active:translate-y-1 active:shadow-none transition-all"
+             >
+               START GAME
+             </button>
+          </div>
+        )}
 
         {isWon && (
           <div className="absolute inset-0 bg-brand-pinklight/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-lg">

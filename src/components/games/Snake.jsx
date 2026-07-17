@@ -22,6 +22,21 @@ export default function Snake() {
   const [isPaused, setIsPaused] = useState(false);
   const [score, setScore] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
+  const [highScore, setHighScore] = useState(0);
+  const [isNewHighScore, setIsNewHighScore] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('tuskee_snake_highscore');
+    if (saved) setHighScore(parseInt(saved, 10));
+  }, []);
+
+  useEffect(() => {
+    if (isGameOver && score > highScore) {
+      setHighScore(score);
+      localStorage.setItem('tuskee_snake_highscore', score);
+      setIsNewHighScore(true);
+    }
+  }, [isGameOver, score, highScore]);
   
   // Use a ref to track the latest direction to prevent quick double-turn self-collisions
   const currentDirectionRef = useRef(direction);
@@ -34,6 +49,7 @@ export default function Snake() {
     setScore(0);
     setIsGameOver(false);
     setIsPaused(false);
+    setIsNewHighScore(false);
   };
 
   const checkCollision = (head, currentSnake) => {
@@ -142,8 +158,16 @@ export default function Snake() {
       {/* Header Bar */}
       <div className="flex justify-between items-center w-full max-w-[320px] bg-[#D2E4D6] p-4 rounded-xl border-2 border-brand-plum/30 shadow-sm mb-2">
         <div className="flex flex-col gap-1">
-          <span className="font-pixel text-[10px] text-brand-plum/70">SCORE</span>
-          <span className="font-pixel text-2xl text-brand-plum leading-none truncate max-w-[120px]">{score}</span>
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col">
+              <span className="font-pixel text-[10px] text-brand-plum/70">SCORE</span>
+              <span className="font-pixel text-xl sm:text-2xl text-brand-plum leading-none truncate">{score}</span>
+            </div>
+            <div className="flex flex-col border-l-2 border-brand-plum/20 pl-3">
+              <span className="font-pixel text-[10px] text-brand-plum/70">HI-SCORE</span>
+              <span className="font-pixel text-xl sm:text-2xl text-brand-plum leading-none truncate">{highScore}</span>
+            </div>
+          </div>
         </div>
         <div className="flex flex-col items-end gap-1 text-right">
           <span className="font-pixel text-[10px] text-brand-plum/70">STATUS</span>
@@ -196,7 +220,14 @@ export default function Snake() {
               {isGameOver ? 'GAME OVER!' : 'Snake Game'}
             </h2>
             {isGameOver && (
-              <span className="font-pixel text-[10px] text-brand-plum/70 mt-2 mb-2">Final Score: {score}</span>
+              <div className="flex flex-col items-center gap-2">
+                <span className="font-pixel text-[10px] text-brand-plum/70 mt-2">Final Score: {score}</span>
+                {isNewHighScore && (
+                  <span className="font-pixel text-sm text-[#e94560] animate-pulse bg-white/80 px-2 py-1 rounded border border-[#e94560]">
+                    NEW HIGH SCORE!
+                  </span>
+                )}
+              </div>
             )}
             <button
               onClick={() => {

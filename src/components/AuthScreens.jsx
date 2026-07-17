@@ -1,10 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { supabase } from '../utils/supabase';
 
 export default function AuthScreens({ authView, setAuthView }) {
-  
-  const handleDirectLogin = (e) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Clear errors when switching views
+  const switchView = (view) => {
+    setError(null);
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    setAuthView(view);
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setAuthView('dashboard');
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      setError(error.message);
+    }
+    setLoading(false);
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) {
+      setError(error.message);
+    }
+    setLoading(false);
   };
 
   const renderLanding = () => (
@@ -47,13 +89,13 @@ export default function AuthScreens({ authView, setAuthView }) {
         {/* Buttons Group */}
         <div className="flex flex-col items-center gap-4 w-full max-w-[220px] flex-shrink-0">
           <button 
-            onClick={() => setAuthView('register')}
+            onClick={() => switchView('register')}
             className="retro-btn bg-[#F5D6D8] text-brand-plum py-3 px-6 font-pixel text-[10px] sm:text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner hover:bg-[#eecbcd] w-full flex-shrink-0"
           >
             [ Register ]
           </button>
           <button 
-            onClick={() => setAuthView('login')}
+            onClick={() => switchView('login')}
             className="retro-btn bg-brand-cream text-brand-plum py-3 px-6 font-pixel text-[10px] sm:text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner w-full flex-shrink-0"
           >
             [ Log In ]
@@ -72,14 +114,21 @@ export default function AuthScreens({ authView, setAuthView }) {
         <span className="font-bold text-[10px] font-pixel tracking-widest uppercase">LOGIN.EXE</span>
       </div>
       
-      <form onSubmit={handleDirectLogin} className="p-6 flex flex-col gap-4">
+      <form onSubmit={handleLogin} className="p-6 flex flex-col gap-4">
+        {error && (
+          <div className="bg-red-100 text-red-700 border-2 border-red-500 p-2 text-xs font-pixel rounded-md">
+            {error}
+          </div>
+        )}
         <div className="flex flex-col gap-1">
-          <label className="font-pixel text-[10px] text-brand-plum uppercase tracking-wider">Username</label>
+          <label className="font-pixel text-[10px] text-brand-plum uppercase tracking-wider">Email</label>
           <input 
-            type="text" 
+            type="email" 
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
-            placeholder="Enter username"
+            placeholder="Enter email"
           />
         </div>
 
@@ -88,6 +137,8 @@ export default function AuthScreens({ authView, setAuthView }) {
           <input 
             type="password" 
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
             placeholder="Enter password"
           />
@@ -96,7 +147,7 @@ export default function AuthScreens({ authView, setAuthView }) {
         <div className="flex justify-between items-center mt-4">
           <button 
             type="button"
-            onClick={() => setAuthView('landing')}
+            onClick={() => switchView('landing')}
             className="font-pixel text-[10px] text-brand-plum/60 hover:text-brand-plum underline decoration-brand-plum/40 hover:decoration-brand-plum transition-colors uppercase tracking-widest"
           >
             [ Back ]
@@ -104,9 +155,10 @@ export default function AuthScreens({ authView, setAuthView }) {
 
           <button 
             type="submit"
-            className="retro-btn bg-brand-cream text-brand-plum py-2 px-6 font-pixel text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner"
+            disabled={loading}
+            className={`retro-btn bg-brand-cream text-brand-plum py-2 px-6 font-pixel text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Sign In
+            {loading ? 'WAIT...' : 'Sign In'}
           </button>
         </div>
       </form>
@@ -119,14 +171,21 @@ export default function AuthScreens({ authView, setAuthView }) {
         <span className="font-bold text-[10px] font-pixel tracking-widest uppercase">SIGNUP.SYS</span>
       </div>
       
-      <form onSubmit={handleDirectLogin} className="p-6 flex flex-col gap-5">
+      <form onSubmit={handleRegister} className="p-6 flex flex-col gap-5">
+        {error && (
+          <div className="bg-red-100 text-red-700 border-2 border-red-500 p-2 text-xs font-pixel rounded-md">
+            {error}
+          </div>
+        )}
         <div className="flex flex-col gap-1">
-          <label className="font-pixel text-[10px] text-brand-plum uppercase tracking-wider">Username</label>
+          <label className="font-pixel text-[10px] text-brand-plum uppercase tracking-wider">Email</label>
           <input 
-            type="text" 
+            type="email" 
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
-            placeholder="Choose username"
+            placeholder="Choose email"
           />
         </div>
 
@@ -135,6 +194,8 @@ export default function AuthScreens({ authView, setAuthView }) {
           <input 
             type="password" 
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
             placeholder="Choose password"
           />
@@ -145,6 +206,8 @@ export default function AuthScreens({ authView, setAuthView }) {
           <input 
             type="password" 
             required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
             placeholder="Confirm password"
           />
@@ -153,7 +216,7 @@ export default function AuthScreens({ authView, setAuthView }) {
         <div className="flex justify-between items-center mt-4">
           <button 
             type="button"
-            onClick={() => setAuthView('landing')}
+            onClick={() => switchView('landing')}
             className="font-pixel text-[10px] text-brand-plum/60 hover:text-brand-plum underline decoration-brand-plum/40 hover:decoration-brand-plum transition-colors uppercase tracking-widest"
           >
             [ Back ]
@@ -161,9 +224,10 @@ export default function AuthScreens({ authView, setAuthView }) {
 
           <button 
             type="submit"
-            className="retro-btn bg-[#D2E4D6] text-brand-plum py-2 px-4 font-pixel text-[10px] sm:text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner"
+            disabled={loading}
+            className={`retro-btn bg-[#D2E4D6] text-brand-plum py-2 px-4 font-pixel text-[10px] sm:text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Create Account
+            {loading ? 'WAIT...' : 'Create Account'}
           </button>
         </div>
       </form>

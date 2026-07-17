@@ -5,8 +5,14 @@ export default function SettingsPanel({ onBackgroundChange }) {
   const [activeTab, setActiveTab] = useState('Profile');
   
   // States for Profile
-  const [username, setUsername] = useState('User');
   const [bgPattern, setBgPattern] = useState('peach');
+  
+  // States for Security Credentials
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
   
   // States for Audio
   const [soundFx, setSoundFx] = useState(true);
@@ -18,9 +24,6 @@ export default function SettingsPanel({ onBackgroundChange }) {
 
   // Load initial settings
   useEffect(() => {
-    const savedUsername = localStorage.getItem('tuskee_username');
-    if (savedUsername) setUsername(savedUsername);
-    
     const savedBgPattern = localStorage.getItem('tuskee_bg_pattern');
     if (savedBgPattern) setBgPattern(savedBgPattern);
     
@@ -32,16 +35,41 @@ export default function SettingsPanel({ onBackgroundChange }) {
   }, []);
 
   // Handlers
-  const handleUsernameChange = (e) => {
-    const val = e.target.value;
-    setUsername(val);
-    localStorage.setItem('tuskee_username', val);
-  };
-
   const handleBgPatternChange = (patternName) => {
     setBgPattern(patternName);
     localStorage.setItem('tuskee_bg_pattern', patternName);
     if (onBackgroundChange) onBackgroundChange(patternName);
+  };
+
+  const handleUpdatePassword = () => {
+    setPasswordError('');
+    setPasswordSuccess('');
+    
+    // In a real app this would be checked securely on the backend.
+    const actualPassword = localStorage.getItem('tuskee_password') || 'password'; // Mock default if not set
+    
+    if (currentPassword !== actualPassword) {
+      setPasswordError('Incorrect current password.');
+      return;
+    }
+    if (newPassword === currentPassword) {
+      setPasswordError('New password cannot be the same as your current password.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+    
+    // Success
+    localStorage.setItem('tuskee_password', newPassword);
+    setPasswordSuccess('Password updated successfully!');
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => setPasswordSuccess(''), 3000);
   };
 
   const handleSoundFxChange = () => {
@@ -70,7 +98,6 @@ export default function SettingsPanel({ onBackgroundChange }) {
       case 'All Data (Factory Reset)':
         localStorage.clear();
         // Keep settings that were just cleared but are actively being displayed
-        localStorage.setItem('tuskee_username', username);
         localStorage.setItem('tuskee_bg_pattern', bgPattern);
         localStorage.setItem('tuskee_sound_fx', soundFx.toString());
         localStorage.setItem('tuskee_volume', volume.toString());
@@ -121,17 +148,6 @@ export default function SettingsPanel({ onBackgroundChange }) {
             {activeTab === 'Profile' && (
               <div className="flex flex-col gap-8 max-w-md">
                 <h3 className="font-pixel text-lg text-brand-plum border-b-2 border-brand-plum/10 pb-2">Personalization</h3>
-                
-                <div className="flex flex-col gap-2">
-                  <label className="font-pixel text-xs text-brand-plum/80">Username</label>
-                  <input 
-                    type="text" 
-                    value={username}
-                    onChange={handleUsernameChange}
-                    className="w-full bg-brand-cream border-2 border-brand-plum rounded-lg px-4 py-3 text-brand-plum placeholder-brand-plum/40 focus:outline-none focus:ring-2 focus:ring-brand-plum/30 font-medium shadow-inner"
-                    placeholder="Enter username"
-                  />
-                </div>
 
                 <div className="flex flex-col gap-3">
                   <label className="font-pixel text-xs text-brand-plum/80">Background Grid Pattern</label>
@@ -155,6 +171,65 @@ export default function SettingsPanel({ onBackgroundChange }) {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <hr className="border-brand-plum/10 my-2" />
+
+                <div className="flex flex-col gap-4">
+                  <h3 className="font-pixel text-lg text-brand-plum">Security Credentials</h3>
+                  
+                  {passwordError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded relative text-xs font-medium">
+                      {passwordError}
+                    </div>
+                  )}
+                  {passwordSuccess && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded relative text-xs font-medium">
+                      {passwordSuccess}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="font-pixel text-[10px] text-brand-plum/80 uppercase">Current Password</label>
+                      <input 
+                        type="password" 
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="w-full bg-[#FFFDF9] border-2 border-brand-plum rounded-lg px-4 py-3 text-brand-plum placeholder-brand-plum/40 focus:outline-none focus:ring-2 focus:ring-brand-plum/30 font-medium shadow-inner"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1">
+                      <label className="font-pixel text-[10px] text-brand-plum/80 uppercase">New Password</label>
+                      <input 
+                        type="password" 
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full bg-[#FFFDF9] border-2 border-brand-plum rounded-lg px-4 py-3 text-brand-plum placeholder-brand-plum/40 focus:outline-none focus:ring-2 focus:ring-brand-plum/30 font-medium shadow-inner"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1">
+                      <label className="font-pixel text-[10px] text-brand-plum/80 uppercase">Confirm New Password</label>
+                      <input 
+                        type="password" 
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full bg-[#FFFDF9] border-2 border-brand-plum rounded-lg px-4 py-3 text-brand-plum placeholder-brand-plum/40 focus:outline-none focus:ring-2 focus:ring-brand-plum/30 font-medium shadow-inner"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+                  
+                  <button 
+                    onClick={handleUpdatePassword}
+                    className="retro-btn bg-[#D2E4D6] text-brand-plum py-3 px-6 font-pixel text-[10px] sm:text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner w-full mt-2"
+                  >
+                    Update Password
+                  </button>
                 </div>
               </div>
             )}

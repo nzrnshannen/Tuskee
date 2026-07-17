@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const GRID_SIZE = 15;
 const INITIAL_SPEED = 150;
@@ -11,6 +12,7 @@ const getRandomPosition = () => {
 };
 
 export default function Snake() {
+  const { gameStats, updateGameStats } = useAuth();
   const [snake, setSnake] = useState([
     { x: 5, y: 5 },
     { x: 4, y: 5 },
@@ -22,19 +24,24 @@ export default function Snake() {
   const [isPaused, setIsPaused] = useState(false);
   const [score, setScore] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
-  const [highScore, setHighScore] = useState(0);
+  const [highScore, setHighScore] = useState(gameStats?.snake_highscore || 0);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('tuskee_snake_highscore');
-    if (saved) setHighScore(parseInt(saved, 10));
-  }, []);
+    if (gameStats?.snake_highscore !== undefined) {
+      setHighScore(gameStats.snake_highscore);
+    } else {
+      const saved = localStorage.getItem('tuskee_snake_highscore');
+      if (saved) setHighScore(parseInt(saved, 10));
+    }
+  }, [gameStats?.snake_highscore]);
 
   useEffect(() => {
     if (isGameOver && score > highScore) {
       setHighScore(score);
       localStorage.setItem('tuskee_snake_highscore', score);
       setIsNewHighScore(true);
+      if (updateGameStats) updateGameStats({ snake_highscore: score });
     }
   }, [isGameOver, score, highScore]);
   

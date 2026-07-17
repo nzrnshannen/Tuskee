@@ -12,6 +12,7 @@ import AuthScreens from './components/AuthScreens';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import { supabase } from './utils/supabase';
+import { useAuth } from './context/AuthContext';
 import './App.css';
 
 // --- Global Desktop Dock Icon Component ---
@@ -32,27 +33,16 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
 };
 
 export default function App() {
+  const { session, profile } = useAuth();
+  
   // Global Authentication State
   const [authView, setAuthView] = useState('landing'); // 'landing', 'login', 'register', 'dashboard'
-  const [session, setSession] = useState(null);
 
-  // Initialize session
+  // Initialize session view
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) setAuthView('dashboard');
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) setAuthView('dashboard');
-      else setAuthView('landing');
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    if (session) setAuthView('dashboard');
+    else setAuthView('landing');
+  }, [session]);
 
   // Global Active Date Key (YYYY-MM-DD)
   const [activeDate, setActiveDate] = useState(
@@ -71,6 +61,14 @@ export default function App() {
       setBgPattern(savedBgPattern);
     }
   }, []);
+
+  // Sync background from profile
+  useEffect(() => {
+    if (profile?.bg_pattern) {
+      setBgPattern(profile.bg_pattern);
+      localStorage.setItem('tuskee_bg_pattern', profile.bg_pattern);
+    }
+  }, [profile?.bg_pattern]);
 
   // Focus timer duration state (default 25 minutes, editable)
   const [focusMinutes, setFocusMinutes] = useState(25);

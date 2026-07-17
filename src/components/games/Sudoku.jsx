@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { generateSudoku } from '../../utils/sudokuGenerator';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Sudoku() {
   const [board, setBoard] = useState([]);
@@ -11,16 +12,22 @@ export default function Sudoku() {
   const [time, setTime] = useState(0);
   const [bestTimes, setBestTimes] = useState({ easy: null, medium: null, hard: null });
   const [isGameActive, setIsGameActive] = useState(false);
+  const { gameStats, updateGameStats } = useAuth();
 
   useEffect(() => {
-    const saved = localStorage.getItem('tuskee_sudoku_best_times');
-    if (saved) {
-      try {
-        setBestTimes(JSON.parse(saved));
-      } catch(e) {}
+    if (gameStats?.sudoku_best_times) {
+      setBestTimes(gameStats.sudoku_best_times);
+    } else {
+      const saved = localStorage.getItem('tuskee_sudoku_best_times');
+      if (saved) {
+        try {
+          setBestTimes(JSON.parse(saved));
+        } catch(e) {}
+      }
     }
     startNewGame();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameStats?.sudoku_best_times]);
 
   useEffect(() => {
     let interval;
@@ -113,6 +120,7 @@ export default function Sudoku() {
           if (currentBest === null || time < currentBest) {
             const newBest = { ...prev, [difficulty]: time };
             localStorage.setItem('tuskee_sudoku_best_times', JSON.stringify(newBest));
+            if (updateGameStats) updateGameStats({ sudoku_best_times: newBest });
             return newBest;
           }
           return prev;

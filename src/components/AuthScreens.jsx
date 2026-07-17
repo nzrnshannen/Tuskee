@@ -7,6 +7,7 @@ export default function AuthScreens({ authView, setAuthView }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Clear errors when switching views
   const switchView = (view) => {
@@ -25,8 +26,25 @@ export default function AuthScreens({ authView, setAuthView }) {
       email,
       password,
     });
+    
     if (error) {
-      setError(error.message);
+      if (error.message === 'Invalid login credentials') {
+        // Attempt to check if the email exists using a custom RPC function
+        const { data: exists, error: rpcError } = await supabase.rpc('check_email_exists', { check_email: email });
+        
+        if (!rpcError && exists !== null) {
+          if (exists) {
+            setError("incorrect password");
+          } else {
+            setError("account doesn't exist");
+          }
+        } else {
+          // Fallback if RPC is not set up
+          setError(error.message);
+        }
+      } else {
+        setError(error.message);
+      }
     }
     setLoading(false);
   };
@@ -45,6 +63,8 @@ export default function AuthScreens({ authView, setAuthView }) {
     });
     if (error) {
       setError(error.message);
+    } else {
+      setShowSuccessModal(true);
     }
     setLoading(false);
   };
@@ -116,7 +136,7 @@ export default function AuthScreens({ authView, setAuthView }) {
       
       <form onSubmit={handleLogin} className="p-6 flex flex-col gap-4">
         {error && (
-          <div className="bg-red-100 text-red-700 border-2 border-red-500 p-2 text-xs font-pixel rounded-md">
+          <div className="bg-red-100 text-red-700 border-2 border-red-500 px-3 py-2 text-xs font-medium rounded-md text-center">
             {error}
           </div>
         )}
@@ -173,7 +193,7 @@ export default function AuthScreens({ authView, setAuthView }) {
       
       <form onSubmit={handleRegister} className="p-6 flex flex-col gap-5">
         {error && (
-          <div className="bg-red-100 text-red-700 border-2 border-red-500 p-2 text-xs font-pixel rounded-md">
+          <div className="bg-red-100 text-red-700 border-2 border-red-500 px-3 py-2 text-xs font-medium rounded-md text-center">
             {error}
           </div>
         )}
@@ -246,6 +266,33 @@ export default function AuthScreens({ authView, setAuthView }) {
         {authView === 'login' && renderLogin()}
         {authView === 'register' && renderRegister()}
       </div>
+
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+          <div 
+            className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-6 text-center shadow-2xl bg-[#FFFBF5]"
+            style={{ padding: '2rem 1.5rem' }}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl drop-shadow-sm">🎉</span>
+              <h2 className="font-pixel text-brand-plum text-lg leading-tight mt-2">Account Created!</h2>
+              <p className="text-brand-plum/80 font-medium text-sm">Your account has been successfully created. You can now log in.</p>
+            </div>
+            
+            <div className="w-full mt-2">
+              <button 
+                className="w-full retro-btn bg-[#D2E4D6] text-brand-plum py-2.5 font-pixel text-[10px] tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner uppercase"
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  switchView('login');
+                }}
+              >
+                Go to Login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

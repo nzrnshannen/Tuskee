@@ -25,8 +25,25 @@ export default function AuthScreens({ authView, setAuthView }) {
       email,
       password,
     });
+    
     if (error) {
-      setError(error.message);
+      if (error.message === 'Invalid login credentials') {
+        // Attempt to check if the email exists using a custom RPC function
+        const { data: exists, error: rpcError } = await supabase.rpc('check_email_exists', { check_email: email });
+        
+        if (!rpcError && exists !== null) {
+          if (exists) {
+            setError("incorrect password");
+          } else {
+            setError("account doesn't exist");
+          }
+        } else {
+          // Fallback if RPC is not set up
+          setError(error.message);
+        }
+      } else {
+        setError(error.message);
+      }
     }
     setLoading(false);
   };
@@ -116,7 +133,7 @@ export default function AuthScreens({ authView, setAuthView }) {
       
       <form onSubmit={handleLogin} className="p-6 flex flex-col gap-4">
         {error && (
-          <div className="bg-red-100 text-red-700 border-2 border-red-500 p-2 text-xs font-pixel rounded-md">
+          <div className="bg-red-100 text-red-700 border-2 border-red-500 px-3 py-2 text-xs font-medium rounded-md text-center">
             {error}
           </div>
         )}
@@ -173,7 +190,7 @@ export default function AuthScreens({ authView, setAuthView }) {
       
       <form onSubmit={handleRegister} className="p-6 flex flex-col gap-5">
         {error && (
-          <div className="bg-red-100 text-red-700 border-2 border-red-500 p-2 text-xs font-pixel rounded-md">
+          <div className="bg-red-100 text-red-700 border-2 border-red-500 px-3 py-2 text-xs font-medium rounded-md text-center">
             {error}
           </div>
         )}

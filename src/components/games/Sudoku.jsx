@@ -187,7 +187,7 @@ export default function Sudoku() {
                   setDifficulty(level); 
                   startNewGame(level); 
                 }}
-                className={`font-pixel text-[10px] px-3 py-1 rounded border-2 transition-all capitalize
+                className={`font-pixel text-[10px] px-3 py-1 rounded border-2 transition-all capitalize whitespace-nowrap
                   ${isActive 
                     ? activeBg 
                     : 'bg-brand-cream text-brand-plum border-brand-plum/20 hover:border-brand-plum'}`}

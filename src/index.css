@@ -14,6 +14,15 @@
 }
 
 /* Global resets for pixel operating system */
+* {
+  /* hide default Edge/IE password reveal button */
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   image-rendering: pixelated;

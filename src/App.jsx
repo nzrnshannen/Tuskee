@@ -9,6 +9,7 @@ import Arcade from './components/Arcade';
 import SettingsPanel from './components/SettingsPanel';
 import CalendarModal from './components/CalendarModal';
 import AuthScreens from './components/AuthScreens';
+import Splashscreen from './components/Splashscreen';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import { supabase } from './utils/supabase';
@@ -35,8 +36,17 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
 export default function App() {
   const { session, profile } = useAuth();
   
-  // Global Authentication State
+  // Global Authentication and Splash State
+  const [loading, setLoading] = useState(true);
   const [authView, setAuthView] = useState('landing'); // 'landing', 'login', 'register', 'dashboard'
+
+  // Splashscreen timer
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2800); // 2.8 seconds
+    return () => clearTimeout(timer);
+  }, []);
 
   // Initialize session view
   useEffect(() => {
@@ -268,6 +278,11 @@ export default function App() {
     await supabase.auth.signOut();
     setAuthView('landing');
   };
+
+  // If loading is true, render the Splashscreen
+  if (loading) {
+    return <Splashscreen />;
+  }
 
   // If not logged in, render authentication screens
   if (authView !== 'dashboard') {

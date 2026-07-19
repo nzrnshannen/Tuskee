@@ -114,12 +114,11 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
                   onChange={(e) => setEditText(e.target.value)}
                   onBlur={saveEdit}
                   onKeyDown={handleEditKeyDown}
-                  maxLength={60}
                   autoFocus
                 />
               ) : (
                 <span 
-                  className={`text-xs font-medium text-brand-plum flex-grow cursor-pointer ${todo.completed ? 'line-through text-brand-plum/50' : ''}`}
+                  className={`text-xs font-medium text-brand-plum flex-grow min-w-0 break-all cursor-pointer ${todo.completed ? 'line-through text-brand-plum/50' : ''}`}
                   onDoubleClick={() => startEditing(todo)}
                   title="Double-click to edit"
                 >
@@ -165,7 +164,6 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
           value={newTodoText}
           onChange={(e) => setNewTodoText(e.target.value)}
           placeholder="+ Add item..."
-          maxLength={60}
         />
         <button type="submit" className="retro-btn whitespace-nowrap shrink-0">
           + ADD

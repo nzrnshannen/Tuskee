@@ -21,6 +21,9 @@ export const AuthProvider = ({ children }) => {
       } else {
         setLoading(false);
       }
+    }).catch(err => {
+      console.error('Supabase getSession error:', err);
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

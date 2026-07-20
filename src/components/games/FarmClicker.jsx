@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const UPGRADES = [
   { id: 'water', name: 'Watering Can', baseCost: 10, clickBonus: 1, autoBonus: 0, icon: '🚿' },
@@ -8,10 +9,13 @@ const UPGRADES = [
 ];
 
 export default function FarmClicker() {
-  const [coins, setCoins] = useState(0);
-  const [clickPower, setClickPower] = useState(1);
-  const [autoPower, setAutoPower] = useState(0);
-  const [inventory, setInventory] = useState({
+  const { gameStats, updateGameStats, session } = useAuth();
+  const farmStats = gameStats?.farm || {};
+
+  const [coins, setCoins] = useState(farmStats.coins || 0);
+  const [clickPower, setClickPower] = useState(farmStats.clickPower || 1);
+  const [autoPower, setAutoPower] = useState(farmStats.autoPower || 0);
+  const [inventory, setInventory] = useState(farmStats.inventory || {
     water: 0,
     fertilizer: 0,
     bees: 0,
@@ -19,6 +23,24 @@ export default function FarmClicker() {
   });
 
   const [clickEffect, setClickEffect] = useState(false);
+  const saveTimeoutRef = useRef(null);
+
+  // Autosave to DB
+  useEffect(() => {
+    if (!session) return;
+    
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    
+    // Debounce save to prevent spamming DB on every click
+    saveTimeoutRef.current = setTimeout(() => {
+      updateGameStats({
+        farm: { coins, clickPower, autoPower, inventory }
+      });
+    }, 5000);
+    
+    return () => clearTimeout(saveTimeoutRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coins, inventory]);
 
   // Auto-generation loop
   useEffect(() => {

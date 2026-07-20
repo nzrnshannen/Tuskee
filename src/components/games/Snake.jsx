@@ -185,8 +185,7 @@ export default function Snake() {
       </div>
 
       {/* Game Board */}
-      <div className="relative bg-[#d8d8c0] border-4 border-brand-plum shadow-[inset_2px_4px_8px_rgba(0,0,0,0.3)] rounded-xl overflow-hidden p-2"
-           style={{ width: '320px', height: '320px' }}>
+      <div className="relative bg-[#d8d8c0] border-4 border-brand-plum shadow-[inset_2px_4px_8px_rgba(0,0,0,0.3)] rounded-xl overflow-hidden p-2 w-full max-w-[320px] aspect-square">
         
         {/* Grid Container */}
         <div 

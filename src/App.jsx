@@ -34,7 +34,7 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
 };
 
 export default function App() {
-  const { session, profile } = useAuth();
+  const { session, profile, updateProfile } = useAuth();
   
   // Global Authentication and Splash State
   const [loading, setLoading] = useState(true);
@@ -112,6 +112,14 @@ export default function App() {
     };
   });
 
+  // Sync records from profile when it loads
+  useEffect(() => {
+    if (profile?.records) {
+      setRecords(profile.records);
+      localStorage.setItem('tuskee_records', JSON.stringify(profile.records));
+    }
+  }, [profile?.records]);
+
   // Focus timer countdown loop
   useEffect(() => {
     let interval = null;
@@ -149,6 +157,9 @@ export default function App() {
   const saveRecords = (updatedRecords) => {
     setRecords(updatedRecords);
     localStorage.setItem('tuskee_records', JSON.stringify(updatedRecords));
+    if (session) {
+      updateProfile({ records: updatedRecords });
+    }
   };
 
   // Extract active day details

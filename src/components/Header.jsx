@@ -20,8 +20,9 @@ export default function Header({ activeDate, onPrevDay, onNextDay, onOpenCalenda
     <header className="retro-window-header bg-brand-cream text-brand-plum flex items-center justify-between p-2 select-none border-b-2 border-brand-plum">
       
       {/* Left Side: System/App title */}
-      <div className="retro-window-title flex items-center gap-2 select-none">
-        <span>TUSKEE MEOW-STATION</span>
+      <div className="retro-window-title flex items-center gap-1 sm:gap-2 select-none text-[8px] sm:text-xs">
+        <span className="hidden sm:inline">TUSKEE MEOW-STATION</span>
+        <span className="sm:hidden">TUSKEE</span>
       </div>
 
       {/* Center: Consolidated Navigation Ticker */}

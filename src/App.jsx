@@ -21,7 +21,7 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
   return (
     <button 
       onClick={onClick}
-      className={`group flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 border-2 ${
+      className={`group flex shrink-0 items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 border-2 ${
         isActive 
           ? 'bg-brand-plum border-brand-plum text-brand-white shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]' 
           : 'bg-brand-white/40 border-brand-plum/10 hover:bg-brand-white/80 hover:border-brand-plum/30 text-brand-plum shadow-sm'
@@ -320,7 +320,7 @@ export default function App() {
       />
 
       {/* Scrollable Main Workspace */}
-      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden w-full flex flex-col items-center pt-8 px-6 pb-6 relative z-10">
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden w-full flex flex-col items-center pt-4 sm:pt-8 px-2 sm:px-6 pb-4 sm:pb-6 relative z-10">
         
         {/* Inner Application Window */}
         <div className="retro-window max-w-[1300px] w-full flex-shrink-0 flex flex-col relative min-h-[fit-content]">
@@ -336,7 +336,7 @@ export default function App() {
             />
 
             {/* Journal Sheets Area */}
-            <div className="flex-grow pt-6 px-6 pb-6 flex flex-col gap-6 bg-brand-pinklight/20">
+            <div className="flex-grow pt-4 sm:pt-6 px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col gap-4 sm:gap-6 bg-brand-pinklight/20">
           
           {/* Top Row: Daily Notes Notepad (Full Width) */}
           <NotesSection 
@@ -383,14 +383,14 @@ export default function App() {
 
         {/* Calculator */}
         {activeApp === 'calculator' && (
-          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-16 bg-brand-pinklight/20 h-full w-full">
+          <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 md:p-16 bg-brand-pinklight/20 h-full w-full">
             <Calculator />
           </div>
         )}
 
         {/* Arcade Games */}
         {activeApp === 'games' && (
-          <div className="flex-grow flex flex-col items-center justify-center p-8 md:p-12 bg-brand-pinklight/20 h-full w-full">
+          <div className="flex-grow flex flex-col items-center justify-center p-2 sm:p-8 md:p-12 bg-brand-pinklight/20 h-full w-full">
             <Arcade />
           </div>
         )}
@@ -403,15 +403,17 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation Dock */}
-      <aside className="flex-shrink-0 flex flex-row gap-4 pt-2 pb-8 items-center justify-center w-full relative z-10">
-        <DesktopIcon emoji="📓" label="Notebook" isActive={activeApp === 'notebook'} onClick={() => setActiveApp('notebook')} />
-        <DesktopIcon emoji="🧮" label="Calculator" isActive={activeApp === 'calculator'} onClick={() => setActiveApp('calculator')} />
-        <DesktopIcon emoji="🎮" label="Games" isActive={activeApp === 'games'} onClick={() => setActiveApp('games')} />
-        <DesktopIcon emoji="⚙️" label="Settings" isActive={activeApp === 'settings'} onClick={() => setActiveApp('settings')} />
-        
-        <div className="w-[2px] h-8 bg-brand-plum/20 rounded-full mx-2"></div>
-        
-        <DesktopIcon emoji="🚪" label="Log Out" isActive={false} onClick={() => setShowLogoutModal(true)} />
+      <aside className="flex-shrink-0 flex flex-row gap-4 pt-2 pb-6 sm:pb-8 items-center justify-start sm:justify-center w-full relative z-10 overflow-x-auto px-4 sm:px-0 snap-x">
+        <div className="flex items-center gap-4 mx-auto w-max min-w-min">
+          <DesktopIcon emoji="📓" label="Notebook" isActive={activeApp === 'notebook'} onClick={() => setActiveApp('notebook')} />
+          <DesktopIcon emoji="🧮" label="Calculator" isActive={activeApp === 'calculator'} onClick={() => setActiveApp('calculator')} />
+          <DesktopIcon emoji="🎮" label="Games" isActive={activeApp === 'games'} onClick={() => setActiveApp('games')} />
+          <DesktopIcon emoji="⚙️" label="Settings" isActive={activeApp === 'settings'} onClick={() => setActiveApp('settings')} />
+          
+          <div className="w-[2px] h-8 bg-brand-plum/20 rounded-full mx-0 sm:mx-2 shrink-0"></div>
+          
+          <DesktopIcon emoji="🚪" label="Log Out" isActive={false} onClick={() => setShowLogoutModal(true)} />
+        </div>
       </aside>
 
       {/* Calendar Navigation Modal Popup */}

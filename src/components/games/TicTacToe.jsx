@@ -218,7 +218,7 @@ export default function TicTacToe() {
       </div>
 
       {/* Board */}
-      <div className="grid grid-cols-3 grid-rows-3 gap-2 bg-brand-plum/20 p-2 rounded-xl shadow-inner w-64 h-64">
+      <div className="grid grid-cols-3 grid-rows-3 gap-2 bg-brand-plum/20 p-2 rounded-xl shadow-inner w-full max-w-[256px] aspect-square">
         {board.map((cell, idx) => (
           <button
             key={idx}

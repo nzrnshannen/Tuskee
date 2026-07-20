@@ -38,16 +38,16 @@ export default function Arcade() {
         </div>
       </div>
 
-      <div className="flex flex-grow min-h-0">
+      <div className="flex flex-col md:flex-row flex-grow min-h-0">
         
         {/* Left Column (30%) - Sidebar */}
-        <div className="w-[30%] min-w-[180px] border-r-2 border-brand-plum bg-brand-pinklight/40 flex flex-col">
-          <div className="flex flex-col gap-3 overflow-hidden p-4">
+        <div className="w-full md:w-[30%] md:min-w-[180px] border-b-2 md:border-b-0 md:border-r-2 border-brand-plum bg-brand-pinklight/40 flex flex-col shrink-0">
+          <div className="flex flex-row md:flex-col gap-2 md:gap-3 overflow-x-auto md:overflow-hidden p-2 md:p-4 snap-x">
           {GAME_LIST.map(game => (
             <button
               key={game.id}
               onClick={() => setActiveMiniGame(game.id)}
-              className={`flex items-center gap-3 p-3 rounded-lg border-2 font-pixel text-[10px] sm:text-xs transition-all w-full text-left
+              className={`flex shrink-0 items-center gap-2 md:gap-3 p-2 md:p-3 rounded-lg border-2 font-pixel text-[10px] sm:text-xs transition-all w-max md:w-full text-left
                 ${activeMiniGame === game.id 
                   ? 'bg-brand-cream border-brand-plum text-brand-plum shadow-[inset_0px_3px_5px_rgba(0,0,0,0.15)] translate-y-[2px]' 
                   : 'bg-[#F5D6D8] border-transparent text-brand-plum hover:bg-brand-cream hover:border-brand-plum/50 hover:-translate-y-1 shadow-sm'
@@ -61,7 +61,7 @@ export default function Arcade() {
         </div>
 
         {/* Right Column (70%) - Game Stage */}
-        <div className="w-[70%] bg-brand-cream/50 p-6 flex flex-col justify-center items-center min-h-0 relative">
+        <div className="w-full md:w-[70%] bg-brand-cream/50 p-4 md:p-6 flex flex-col justify-center items-center min-h-0 relative flex-grow">
           {/* CRT Screen Inset container */}
           <div className="w-full h-full bg-[#d8d8c0] border-4 border-brand-plum shadow-[inset_4px_6px_16px_rgba(0,0,0,0.3)] rounded-xl flex items-center justify-center relative overflow-hidden">
             <div className="absolute top-4 left-4 opacity-20 text-[10px] font-pixel pointer-events-none">GAME-BOY ADVANCE</div>

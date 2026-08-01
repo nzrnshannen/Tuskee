@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase';
 
 export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }) {
@@ -15,6 +15,23 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [cooldownTime, setCooldownTime] = useState(0);
+  const [failedOtpAttempts, setFailedOtpAttempts] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (cooldownTime > 0) {
+      timer = setTimeout(() => setCooldownTime((prev) => prev - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [cooldownTime]);
+
+  const validatePassword = (pw) => {
+    if (pw.length < 8) return "Min 8 characters required.";
+    if (!/[0-9]/.test(pw)) return "At least one number required.";
+    if (!/[^A-Za-z0-9]/.test(pw)) return "At least one special character required.";
+    return null;
+  };
 
   // Clear errors when switching views
   const switchView = (view) => {
@@ -30,6 +47,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
     setConfirmNewPassword('');
     setShowRecoveryModal(false);
     setShowSuccessModal(false);
+    setFailedOtpAttempts(0);
     setAuthView(view);
   };
 
@@ -66,6 +84,11 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    const pwError = validatePassword(password);
+    if (pwError) {
+      setError(pwError);
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -86,12 +109,14 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
 
   const handleRequestRecovery = async (e) => {
     e.preventDefault();
+    if (cooldownTime > 0) return;
     setLoading(true);
     setError(null);
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) {
       setError(error.message);
     } else {
+      setCooldownTime(60);
       setShowRecoveryModal(true);
     }
     setLoading(false);
@@ -107,8 +132,18 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
       type: 'recovery'
     });
     if (error) {
-      setError(error.message);
+      const newAttempts = failedOtpAttempts + 1;
+      if (newAttempts >= 3) {
+        setError("Too many failed attempts. Please request a new code.");
+        setForgotPasswordStep(1);
+        setFailedOtpAttempts(0);
+        setResetCode('');
+      } else {
+        setFailedOtpAttempts(newAttempts);
+        setError(error.message);
+      }
     } else {
+      setFailedOtpAttempts(0);
       setForgotPasswordStep(3);
     }
     setLoading(false);
@@ -116,6 +151,11 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
+    const pwError = validatePassword(newPassword);
+    if (pwError) {
+      setError(pwError);
+      return;
+    }
     if (newPassword !== confirmNewPassword) {
       setError("Passwords do not match");
       return;
@@ -210,7 +250,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
             type="email" 
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
             className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
             placeholder="Enter email"
           />
@@ -298,7 +338,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
             type="email" 
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
             className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
             placeholder="Choose email"
           />
@@ -336,6 +376,9 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
               )}
             </button>
           </div>
+          {password.length > 0 && validatePassword(password) && (
+            <span className="text-[9px] text-red-500 font-pixel mt-1">{validatePassword(password)}</span>
+          )}
         </div>
 
         <div className="flex flex-col gap-1">
@@ -414,7 +457,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
                 type="email" 
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
                 className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 text-sm font-medium outline-none transition-colors"
                 placeholder="Enter email to recover"
               />
@@ -429,10 +472,10 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
               </button>
               <button 
                 type="submit"
-                disabled={loading}
-                className={`retro-btn bg-brand-cream text-brand-plum py-2 px-4 font-pixel text-[10px] sm:text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading || cooldownTime > 0}
+                className={`retro-btn bg-brand-cream text-brand-plum py-2 px-4 font-pixel text-[10px] sm:text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner ${loading || cooldownTime > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                {loading ? 'WAIT...' : 'Send Code'}
+                {loading ? 'WAIT...' : cooldownTime > 0 ? `Resend code in ${cooldownTime}s` : 'Send Code'}
               </button>
             </div>
           </form>
@@ -497,6 +540,9 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
                   )}
                 </button>
               </div>
+              {newPassword.length > 0 && validatePassword(newPassword) && (
+                <span className="text-[9px] text-red-500 font-pixel mt-1">{validatePassword(newPassword)}</span>
+              )}
             </div>
             
             <div className="flex flex-col gap-1">

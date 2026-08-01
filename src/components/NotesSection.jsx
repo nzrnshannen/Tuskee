@@ -16,8 +16,14 @@ export default function NotesSection({ notes, onNotesChange, activeDate }) {
     setIsDirty(true);
   };
 
+  const sanitizeInput = (str) => {
+    if (typeof str !== 'string') return '';
+    return str.replace(/<[^>]*>?/gm, '');
+  };
+
   const handlePost = () => {
-    onNotesChange(localNotes);
+    const cleanNotes = sanitizeInput(localNotes);
+    onNotesChange(cleanNotes);
     setIsDirty(false);
   };
 
@@ -44,6 +50,7 @@ export default function NotesSection({ notes, onNotesChange, activeDate }) {
 
       {/* Notepad body */}
       <textarea
+        maxLength={10000}
         className="w-full min-h-[110px] text-brand-plum bg-[#FFFDF9] border-t-2 border-[#7d6972]/30 outline-none resize-y text-sm font-cozy leading-[1.8]"
         style={{ paddingLeft: '28px', paddingRight: '24px', paddingTop: '24px', paddingBottom: '24px' }}
         value={localNotes}

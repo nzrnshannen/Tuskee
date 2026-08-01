@@ -8,13 +8,18 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
   const [deletedTasksStack, setDeletedTasksStack] = useState([]);
   const [showEmptyTaskModal, setShowEmptyTaskModal] = useState(false);
 
+  const sanitizeInput = (str) => str.replace(/<[^>]*>?/gm, '');
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!newTodoText.trim()) {
       setShowEmptyTaskModal(true);
       return;
     }
-    onAddTodo(newTodoText.trim());
+    const cleanText = sanitizeInput(newTodoText.trim());
+    if (cleanText) {
+      onAddTodo(cleanText);
+    }
     setNewTodoText('');
   };
 
@@ -37,8 +42,9 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
   };
 
   const saveEdit = () => {
-    if (editText.trim() && editingId) {
-      onEditTodo(editingId, editText.trim());
+    const cleanText = sanitizeInput(editText.trim());
+    if (cleanText && editingId) {
+      onEditTodo(editingId, cleanText);
     }
     setEditingId(null);
     setEditText('');
@@ -109,6 +115,7 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
               {editingId === todo.id ? (
                 <input
                   type="text"
+                  maxLength={255}
                   className="flex-grow bg-[#FFFDF9] border-2 border-brand-plum p-1 text-xs text-brand-plum outline-none"
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
@@ -160,6 +167,7 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
       <form className="px-6 pb-6 pt-3 border-t-2 border-brand-plum/10 bg-brand-cream/30 flex gap-2" onSubmit={handleSubmit}>
         <input
           type="text"
+          maxLength={255}
           className="flex-grow bg-[#FFFDF9] border-2 border-[#7d6972] p-2 text-xs text-brand-plum outline-none shadow-inner"
           value={newTodoText}
           onChange={(e) => setNewTodoText(e.target.value)}

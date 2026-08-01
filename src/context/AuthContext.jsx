@@ -26,10 +26,19 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
+      
+      if (event === 'SIGNED_OUT') {
+        // Local storage purge is handled by logout() or manually if signed out from another tab
+        localStorage.removeItem('tuskee_records');
+        localStorage.removeItem('tuskee_goals');
+        localStorage.removeItem('tuskee_bg_pattern');
+        setProfile(null);
+        setGameStats({});
+        setLoading(false);
+      } else if (session?.user) {
         fetchUserData(session.user.id);
       } else {
         setProfile(null);
@@ -41,22 +50,48 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const logout = async (reason = null) => {
+    // Purge local storage caches
+    localStorage.removeItem('tuskee_records');
+    localStorage.removeItem('tuskee_goals');
+    localStorage.removeItem('tuskee_bg_pattern');
+
+    // Sign out from Supabase
+    await supabase.auth.signOut();
+
+    if (reason === 'session_expired') {
+      window.dispatchEvent(new CustomEvent('session_expired'));
+    }
+  };
+
+  const checkErrorAndLogout = (error) => {
+    if (error && (error.code === 'PGRST301' || error.status === 401 || error.message?.includes('JWT'))) {
+      logout('session_expired');
+      return true;
+    }
+    return false;
+  };
+
   const fetchUserData = async (userId) => {
     // Fetch profile
-    const { data: profileData } = await supabase
+    const { data: profileData, error: pError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
     
+    if (checkErrorAndLogout(pError)) return;
+    
     setProfile(profileData || {});
 
     // Fetch game stats
-    const { data: statsData } = await supabase
+    const { data: statsData, error: sError } = await supabase
       .from('game_stats')
       .select('*')
       .eq('id', userId)
       .single();
+
+    if (checkErrorAndLogout(sError)) return;
 
     setGameStats(statsData?.stats || {});
     setLoading(false);
@@ -68,10 +103,11 @@ export const AuthProvider = ({ children }) => {
     setProfile(newProfile);
     
     // Upsert to Supabase
-    await supabase.from('profiles').upsert({
+    const { error } = await supabase.from('profiles').upsert({
       id: user.id,
       ...updates
     });
+    checkErrorAndLogout(error);
   };
 
   const updateGameStats = async (updates) => {
@@ -80,10 +116,11 @@ export const AuthProvider = ({ children }) => {
     setGameStats(newStats);
 
     // Upsert to Supabase
-    await supabase.from('game_stats').upsert({
+    const { error } = await supabase.from('game_stats').upsert({
       id: user.id,
       stats: newStats
     });
+    checkErrorAndLogout(error);
   };
 
   const value = {
@@ -93,7 +130,8 @@ export const AuthProvider = ({ children }) => {
     gameStats,
     updateProfile,
     updateGameStats,
-    loading
+    loading,
+    logout
   };
 
   return (

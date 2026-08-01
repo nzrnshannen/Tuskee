@@ -34,7 +34,7 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
 };
 
 export default function App() {
-  const { session, profile, updateProfile } = useAuth();
+  const { session, profile, updateProfile, logout } = useAuth();
   
   // Global Authentication and Splash State
   const [loading, setLoading] = useState(true);
@@ -63,7 +63,17 @@ export default function App() {
   const [showTimeUpModal, setShowTimeUpModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showRegistrationSuccess, setShowRegistrationSuccess] = useState(false);
+  const [sessionExpiredMsg, setSessionExpiredMsg] = useState(false);
   const [bgPattern, setBgPattern] = useState('peach');
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setSessionExpiredMsg(true);
+      setAuthView('login');
+    };
+    window.addEventListener('session_expired', handleSessionExpired);
+    return () => window.removeEventListener('session_expired', handleSessionExpired);
+  }, []);
 
   useEffect(() => {
     setupGlobalClickSound();
@@ -286,7 +296,7 @@ export default function App() {
   const handleConfirmLogout = async () => {
     // Clear active UI session and route to landing
     setShowLogoutModal(false);
-    await supabase.auth.signOut();
+    await logout();
     setAuthView('landing');
   };
 
@@ -297,7 +307,31 @@ export default function App() {
 
   // If not logged in, render authentication screens
   if (authView !== 'dashboard') {
-    return <AuthScreens authView={authView} setAuthView={setAuthView} onRegisterSuccess={() => setShowRegistrationSuccess(true)} />;
+    return (
+      <>
+        <AuthScreens authView={authView} setAuthView={setAuthView} onRegisterSuccess={() => setShowRegistrationSuccess(true)} />
+        {/* Session Expired Modal */}
+        {sessionExpiredMsg && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+            <div className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-6 text-center shadow-2xl bg-[#FFFBF5]" style={{ padding: '2rem 1.5rem' }}>
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-5xl drop-shadow-sm">⏱️</span>
+                <h2 className="font-pixel text-brand-plum text-lg leading-tight mt-2">Session Expired</h2>
+                <p className="text-brand-plum/80 font-medium text-sm">Your login session has expired. Please log in again to continue.</p>
+              </div>
+              <div className="w-full mt-2">
+                <button 
+                  className="w-full retro-btn bg-[#D2E4D6] text-brand-plum py-2.5 font-pixel text-[10px] tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner uppercase"
+                  onClick={() => setSessionExpiredMsg(false)}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    );
   }
 
   const getBgColor = (pattern) => {

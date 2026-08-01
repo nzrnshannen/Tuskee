@@ -10,6 +10,7 @@ import SettingsPanel from './components/SettingsPanel';
 import CalendarModal from './components/CalendarModal';
 import AuthScreens from './components/AuthScreens';
 import Splashscreen from './components/Splashscreen';
+import AnalyticsModule from './components/AnalyticsModule';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import { supabase } from './utils/supabase';

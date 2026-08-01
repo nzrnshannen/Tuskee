@@ -3,6 +3,7 @@ import { PixelPaw, PixelTrash, PixelPencil, PixelCatEars } from './PixelIcons';
 
 export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTodo, onEditTodo, onRestoreTodo }) {
   const [newTodoText, setNewTodoText] = useState('');
+  const [isDailyGoal, setIsDailyGoal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [deletedTasksStack, setDeletedTasksStack] = useState([]);
@@ -14,8 +15,9 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
       setShowEmptyTaskModal(true);
       return;
     }
-    onAddTodo(newTodoText.trim());
+    onAddTodo(newTodoText.trim(), isDailyGoal);
     setNewTodoText('');
+    setIsDailyGoal(false);
   };
 
   const handleUndo = () => {
@@ -122,7 +124,7 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
                   onDoubleClick={() => startEditing(todo)}
                   title="Double-click to edit"
                 >
-                  {todo.text}
+                  {todo.text} {todo.is_daily_goal && <span title="Daily Goal" className="ml-1 inline-block drop-shadow-sm">⭐️</span>}
                 </span>
               )}
 
@@ -157,17 +159,29 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
       </div>
 
       {/* Form Input at the bottom */}
-      <form className="px-6 pb-6 pt-3 border-t-2 border-brand-plum/10 bg-brand-cream/30 flex gap-2" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          className="flex-grow bg-[#FFFDF9] border-2 border-[#7d6972] p-2 text-xs text-brand-plum outline-none shadow-inner"
-          value={newTodoText}
-          onChange={(e) => setNewTodoText(e.target.value)}
-          placeholder="+ Add item..."
-        />
-        <button type="submit" className="retro-btn whitespace-nowrap shrink-0">
-          + ADD
-        </button>
+      <form className="px-6 pb-6 pt-3 border-t-2 border-brand-plum/10 bg-brand-cream/30 flex flex-col gap-2" onSubmit={handleSubmit}>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            className="flex-grow bg-[#FFFDF9] border-2 border-[#7d6972] p-2 text-xs text-brand-plum outline-none shadow-inner"
+            value={newTodoText}
+            onChange={(e) => setNewTodoText(e.target.value)}
+            placeholder="+ Add item..."
+          />
+          <button type="submit" className="retro-btn whitespace-nowrap shrink-0">
+            + ADD
+          </button>
+        </div>
+        <div className="flex items-center gap-2 px-1 pb-1">
+          <input 
+            type="checkbox" 
+            id="daily-goal-toggle" 
+            checked={isDailyGoal} 
+            onChange={(e) => setIsDailyGoal(e.target.checked)} 
+            className="cursor-pointer appearance-none w-3 h-3 border border-brand-plum rounded-sm checked:bg-brand-plum checked:after:content-['✓'] checked:after:text-brand-white checked:after:text-[8px] checked:after:absolute relative flex items-center justify-center"
+          />
+          <label htmlFor="daily-goal-toggle" className="text-[9px] font-pixel text-brand-plum/80 cursor-pointer uppercase tracking-wider mt-0.5">Make this a Daily Goal ⭐️</label>
+        </div>
       </form>
 
       {/* Empty Task Validation Modal */}

@@ -11,6 +11,7 @@ import CalendarModal from './components/CalendarModal';
 import AuthScreens from './components/AuthScreens';
 import Splashscreen from './components/Splashscreen';
 import AnalyticsModule from './components/AnalyticsModule';
+import WeeklyGoals from './components/WeeklyGoals';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import { supabase } from './utils/supabase';
@@ -109,8 +110,9 @@ export default function App() {
     }
     
     // Seed cozy retro OS theme mock logs
+    const today = new Date().toISOString().split('T')[0];
     return {
-      '2026-07-11': {
+      [today]: {
         notes: "Tuskee Meow-Station started successfully. 💻✨\n\nDaily log: Connected the lofi jukebox streams, configured Tailwind v4 compile filters, and set up the beveled 3D windows. Everything feels incredibly cozy in this desktop workspace!\n\nClick the Calendar shortcut on the left to navigate macros, or start the focus clock to get into the vibe. 🌸",
         todos: [
           { id: 1, text: "Click calendar shortcut to test Month/Year modal", completed: true },
@@ -123,13 +125,26 @@ export default function App() {
     };
   });
 
-  // Sync records from profile when it loads
+  // Global goals state
+  const [goals, setGoals] = useState(() => {
+    const saved = localStorage.getItem('tuskee_goals');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return { daily: [], weekly: {} };
+  });
+
+  // Sync records & goals from profile when it loads
   useEffect(() => {
     if (profile?.records) {
       setRecords(profile.records);
       localStorage.setItem('tuskee_records', JSON.stringify(profile.records));
     }
-  }, [profile?.records]);
+    if (profile?.goals) {
+      setGoals(profile.goals);
+      localStorage.setItem('tuskee_goals', JSON.stringify(profile.goals));
+    }
+  }, [profile?.records, profile?.goals]);
 
   // Focus timer countdown loop
   useEffect(() => {
@@ -170,6 +185,15 @@ export default function App() {
     localStorage.setItem('tuskee_records', JSON.stringify(updatedRecords));
     if (session) {
       updateProfile({ records: updatedRecords });
+    }
+  };
+
+  // Helper to save goals state
+  const saveGoals = (updatedGoals) => {
+    setGoals(updatedGoals);
+    localStorage.setItem('tuskee_goals', JSON.stringify(updatedGoals));
+    if (session) {
+      updateProfile({ goals: updatedGoals });
     }
   };
 
@@ -214,12 +238,21 @@ export default function App() {
     saveRecords(updatedRecords);
   };
 
-  const handleAddTodo = (todoText) => {
+  const handleAddTodo = (todoText, isDailyGoal = false) => {
     const newTodo = {
       id: Date.now(),
       text: todoText,
-      completed: false
+      completed: false,
+      is_daily_goal: isDailyGoal
     };
+    
+    if (isDailyGoal) {
+      const updatedGoals = {
+        ...goals,
+        daily: [...(goals.daily || []), { id: newTodo.id, text: todoText }]
+      };
+      saveGoals(updatedGoals);
+    }
     
     const updatedRecords = {
       ...records,
@@ -232,7 +265,18 @@ export default function App() {
   };
 
   const handleToggleTodo = (todoId) => {
-    const updatedTodos = (activeRecord.todos || []).map(todo => {
+    let currentTodos = activeRecord.todos || [];
+    
+    // Auto-inject missing daily goal into activeRecord if toggled on the current day
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (activeDate === todayStr && !currentTodos.find(t => t.id === todoId)) {
+      const dg = (goals.daily || []).find(g => g.id === todoId);
+      if (dg) {
+        currentTodos = [...currentTodos, { ...dg, completed: false, is_daily_goal: true }];
+      }
+    }
+
+    const updatedTodos = currentTodos.map(todo => {
       if (todo.id === todoId) {
         return { ...todo, completed: !todo.completed };
       }
@@ -250,6 +294,15 @@ export default function App() {
   };
 
   const handleDeleteTodo = (todoId) => {
+    // If it is a global daily goal, remove it from the recurring list
+    const isDaily = (goals.daily || []).some(g => g.id === todoId) || (activeRecord.todos || []).find(t => t.id === todoId)?.is_daily_goal;
+    if (isDaily) {
+      saveGoals({
+        ...goals,
+        daily: (goals.daily || []).filter(g => g.id !== todoId)
+      });
+    }
+
     const updatedTodos = (activeRecord.todos || []).filter(todo => todo.id !== todoId);
     
     const updatedRecords = {
@@ -385,14 +438,36 @@ export default function App() {
             
             {/* Left Column: Task Checklist Manager */}
             <div className="min-w-0 h-full">
-              <TodoSection 
-                todos={activeRecord.todos || []}
-                onAddTodo={handleAddTodo}
-                onToggleTodo={handleToggleTodo}
-                onDeleteTodo={handleDeleteTodo}
-                onEditTodo={handleEditTodo}
-                onRestoreTodo={handleRestoreTodo}
-              />
+              {(() => {
+                let displayTodos = [...(activeRecord.todos || [])];
+                const todayStr = new Date().toISOString().split('T')[0];
+                
+                // Dynamically inject global daily goals only if viewing "today"
+                if (activeDate === todayStr && goals.daily) {
+                  goals.daily.forEach(dg => {
+                    const exists = displayTodos.find(t => t.id === dg.id || t.text === dg.text);
+                    if (!exists) {
+                      displayTodos.push({
+                        id: dg.id,
+                        text: dg.text,
+                        completed: false,
+                        is_daily_goal: true
+                      });
+                    }
+                  });
+                }
+                
+                return (
+                  <TodoSection 
+                    todos={displayTodos}
+                    onAddTodo={handleAddTodo}
+                    onToggleTodo={handleToggleTodo}
+                    onDeleteTodo={handleDeleteTodo}
+                    onEditTodo={handleEditTodo}
+                    onRestoreTodo={handleRestoreTodo}
+                  />
+                );
+              })()}
             </div>
 
             {/* Right Column: stacked Spotify Media Player and countdown clock */}
@@ -411,6 +486,8 @@ export default function App() {
             </div>
 
           </div>
+          
+          <WeeklyGoals goals={goals} saveGoals={saveGoals} />
 
         </div>
           </>
@@ -434,6 +511,11 @@ export default function App() {
         {activeApp === 'settings' && (
           <SettingsPanel onBackgroundChange={setBgPattern} />
         )}
+
+        {/* Analytics Module */}
+        {activeApp === 'analytics' && (
+          <AnalyticsModule records={records} />
+        )}
         </div>
       </main>
 
@@ -441,6 +523,7 @@ export default function App() {
       <aside className="flex-shrink-0 flex flex-row gap-4 pt-2 pb-6 sm:pb-8 items-center justify-start sm:justify-center w-full relative z-10 overflow-x-auto px-4 sm:px-0 snap-x">
         <div className="flex items-center gap-4 mx-auto w-max min-w-min">
           <DesktopIcon emoji="📓" label="Notebook" isActive={activeApp === 'notebook'} onClick={() => setActiveApp('notebook')} />
+          <DesktopIcon emoji="📈" label="Analytics" isActive={activeApp === 'analytics'} onClick={() => setActiveApp('analytics')} />
           <DesktopIcon emoji="🧮" label="Calculator" isActive={activeApp === 'calculator'} onClick={() => setActiveApp('calculator')} />
           <DesktopIcon emoji="🎮" label="Games" isActive={activeApp === 'games'} onClick={() => setActiveApp('games')} />
           <DesktopIcon emoji="⚙️" label="Settings" isActive={activeApp === 'settings'} onClick={() => setActiveApp('settings')} />

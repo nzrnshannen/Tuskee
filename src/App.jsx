@@ -10,6 +10,7 @@ import SettingsPanel from './components/SettingsPanel';
 import CalendarModal from './components/CalendarModal';
 import AuthScreens from './components/AuthScreens';
 import Splashscreen from './components/Splashscreen';
+import AnalyticsModule from './components/AnalyticsModule';
 import { setupGlobalClickSound } from './utils/audio';
 import { PixelCatEars } from './components/PixelIcons';
 import { supabase } from './utils/supabase';
@@ -400,6 +401,11 @@ export default function App() {
         {activeApp === 'settings' && (
           <SettingsPanel onBackgroundChange={setBgPattern} />
         )}
+
+        {/* Analytics Module */}
+        {activeApp === 'analytics' && (
+          <AnalyticsModule records={records} />
+        )}
         </div>
       </main>
 
@@ -407,6 +413,7 @@ export default function App() {
       <aside className="flex-shrink-0 flex flex-row gap-4 pt-2 pb-6 sm:pb-8 items-center justify-start sm:justify-center w-full relative z-10 overflow-x-auto px-4 sm:px-0 snap-x">
         <div className="flex items-center gap-4 mx-auto w-max min-w-min">
           <DesktopIcon emoji="📓" label="Notebook" isActive={activeApp === 'notebook'} onClick={() => setActiveApp('notebook')} />
+          <DesktopIcon emoji="📈" label="Analytics" isActive={activeApp === 'analytics'} onClick={() => setActiveApp('analytics')} />
           <DesktopIcon emoji="🧮" label="Calculator" isActive={activeApp === 'calculator'} onClick={() => setActiveApp('calculator')} />
           <DesktopIcon emoji="🎮" label="Games" isActive={activeApp === 'games'} onClick={() => setActiveApp('games')} />
           <DesktopIcon emoji="⚙️" label="Settings" isActive={activeApp === 'settings'} onClick={() => setActiveApp('settings')} />

@@ -98,8 +98,9 @@ export default function App() {
     }
     
     // Seed cozy retro OS theme mock logs
+    const today = new Date().toISOString().split('T')[0];
     return {
-      '2026-07-11': {
+      [today]: {
         notes: "Tuskee Meow-Station started successfully. 💻✨\n\nDaily log: Connected the lofi jukebox streams, configured Tailwind v4 compile filters, and set up the beveled 3D windows. Everything feels incredibly cozy in this desktop workspace!\n\nClick the Calendar shortcut on the left to navigate macros, or start the focus clock to get into the vibe. 🌸",
         todos: [
           { id: 1, text: "Click calendar shortcut to test Month/Year modal", completed: true },

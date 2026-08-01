@@ -1,5 +1,7 @@
 # 🌸 Tuskee
 
+> **Live Demo:** Try Tuskee directly in your browser at [tuskee-notebook.vercel.app](https://tuskee-notebook.vercel.app)
+
 Tuskee is a cozy, retro-inspired personal dashboard and productivity application built with React, Vite, and Tailwind CSS. It is designed to feel like a vintage desktop OS workspace, combining task management, focus tools, and entertainment into a single, beautifully crafted interface.
 
 ## ✨ Features
@@ -24,7 +26,11 @@ Tuskee is a cozy, retro-inspired personal dashboard and productivity application
 - **Backend & Auth**: Supabase (PostgreSQL + GoTrue Auth)
 - **Deployment**: Vercel
 
-## 🚀 Getting Started
+## 🚀 Local Development
+
+Because Tuskee is already deployed on Vercel, **you do not need to set it up locally to use it!** Just visit the [live site](https://tuskee-notebook.vercel.app). 
+
+However, if you wish to contribute to the code or run your own local development server, follow these steps:
 
 ### Prerequisites
 Make sure you have Node.js and npm installed on your machine.
@@ -58,5 +64,4 @@ Make sure you have Node.js and npm installed on your machine.
 
 ## 📜 Deployment
 
-This project is configured to be seamlessly deployed on **Vercel**. 
-When deploying, make sure to add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to your Vercel Project Environment Variables to ensure authentication works in production!
+This project is deployed on **Vercel**. When deploying your own fork, make sure to add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to your Vercel Project Environment Variables to ensure authentication works in production!

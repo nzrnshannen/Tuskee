@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { PixelCatEars } from './PixelIcons';
+import NotificationModal from './NotificationModal';
 
 export default function NotesSection({ notes, onNotesChange, activeDate }) {
   const [localNotes, setLocalNotes] = useState(notes || '');
   const [isDirty, setIsDirty] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   // Sync state when props change (e.g. date changes) — discard unsaved drafts
   useEffect(() => {
@@ -25,6 +27,7 @@ export default function NotesSection({ notes, onNotesChange, activeDate }) {
     const cleanNotes = sanitizeInput(localNotes);
     onNotesChange(cleanNotes);
     setIsDirty(false);
+    setNotification({ title: 'Journal Saved', message: 'Your note has been posted successfully!', icon: '📝' });
   };
 
   const handleClear = () => {
@@ -97,6 +100,11 @@ export default function NotesSection({ notes, onNotesChange, activeDate }) {
           </button>
         </div>
       </div>
+
+      <NotificationModal 
+        notification={notification} 
+        onClose={() => setNotification(null)} 
+      />
     </section>
   );
 }

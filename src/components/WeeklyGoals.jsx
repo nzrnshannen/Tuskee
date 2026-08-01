@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PixelCatEars } from './PixelIcons';
 import { format, startOfWeek } from 'date-fns';
+import NotificationModal from './NotificationModal';
 
 export default function WeeklyGoals({ goals, saveGoals }) {
   // Get current ISO week string (e.g. 2026-W31)
@@ -12,6 +13,7 @@ export default function WeeklyGoals({ goals, saveGoals }) {
   
   const [localText, setLocalText] = useState(currentWeeklyGoal);
   const [isDirty, setIsDirty] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     setLocalText(currentWeeklyGoal);
@@ -32,6 +34,7 @@ export default function WeeklyGoals({ goals, saveGoals }) {
       weekly: updatedWeekly
     });
     setIsDirty(false);
+    setNotification({ title: 'Weekly Task Created', message: 'It will be applied to future days in the week.', icon: '🎯' });
   };
 
   const handleDiscard = () => {
@@ -80,6 +83,11 @@ export default function WeeklyGoals({ goals, saveGoals }) {
           </button>
         </div>
       </div>
+
+      <NotificationModal 
+        notification={notification} 
+        onClose={() => setNotification(null)} 
+      />
     </section>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PixelPaw, PixelTrash, PixelPencil, PixelCatEars } from './PixelIcons';
+import NotificationModal from './NotificationModal';
 
 export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTodo, onEditTodo, onRestoreTodo }) {
   const [newTodoText, setNewTodoText] = useState('');
@@ -9,15 +10,6 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
   const [deletedTasksStack, setDeletedTasksStack] = useState([]);
   const [showEmptyTaskModal, setShowEmptyTaskModal] = useState(false);
   const [notification, setNotification] = useState(null);
-
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => {
-        setNotification(null);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
 
   const sanitizeInput = (str) => str.replace(/<[^>]*>?/gm, '');
 
@@ -30,7 +22,11 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
     const cleanText = sanitizeInput(newTodoText.trim());
     if (cleanText) {
       onAddTodo(cleanText, isDailyGoal);
-      setNotification({ type: 'add', message: 'Task Added Successfully!', icon: '✨' });
+      if (isDailyGoal) {
+        setNotification({ title: 'Daily Goal Set!', message: 'This task will automatically appear every day.', icon: '⭐️' });
+      } else {
+        setNotification({ title: 'Success', message: 'Task Added Successfully!', icon: '✨' });
+      }
     }
     setNewTodoText('');
     setIsDailyGoal(false);
@@ -47,7 +43,7 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
   const handleDelete = (todo, index) => {
     setDeletedTasksStack(prev => [...prev, { task: todo, index }]);
     onDeleteTodo(todo.id);
-    setNotification({ type: 'delete', message: 'Task Deleted!', icon: '🗑️' });
+    setNotification({ title: 'Deleted', message: 'Task Deleted!', icon: '🗑️' });
   };
 
   const startEditing = (todo) => {
@@ -59,7 +55,7 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
     const cleanText = sanitizeInput(editText.trim());
     if (cleanText && editingId) {
       onEditTodo(editingId, cleanText);
-      setNotification({ type: 'edit', message: 'Task Updated Successfully!', icon: '✏️' });
+      setNotification({ title: 'Updated', message: 'Task Updated Successfully!', icon: '✏️' });
     }
     setEditingId(null);
     setEditText('');
@@ -232,30 +228,10 @@ export default function TodoSection({ todos, onAddTodo, onToggleTodo, onDeleteTo
       )}
 
       {/* Success Notification Modal */}
-      {notification && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
-          <div 
-            className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-4 text-center shadow-2xl animate-bounce-short"
-            style={{ paddingTop: '2rem', paddingBottom: '1.5rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', backgroundColor: '#FFFBF5' }}
-          >
-            <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
-              <span className="text-5xl leading-none" style={{ display: 'inline-block' }}>{notification.icon}</span>
-            </div>
-            <h2 className="font-pixel text-brand-plum text-sm leading-tight">Success</h2>
-            <p className="text-brand-plum/80 font-medium text-xs">
-              {notification.message}
-            </p>
-            <div className="w-full mt-4 flex gap-4">
-              <button 
-                className="retro-btn px-4 py-2 w-full text-[10px] font-pixel tracking-wider"
-                onClick={() => setNotification(null)}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <NotificationModal 
+        notification={notification} 
+        onClose={() => setNotification(null)} 
+      />
     </div>
   );
 }

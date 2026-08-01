@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase';
 
-export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }) {
+export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -78,6 +78,8 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess }
       } else {
         setError(error.message);
       }
+    } else {
+      if (onLoginSuccess) onLoginSuccess();
     }
     setLoading(false);
   };

@@ -65,6 +65,7 @@ export default function App() {
   const [showTimeUpModal, setShowTimeUpModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showRegistrationSuccess, setShowRegistrationSuccess] = useState(false);
+  const [showWelcomeBackModal, setShowWelcomeBackModal] = useState(false);
   const [sessionExpiredMsg, setSessionExpiredMsg] = useState(false);
   const [bgPattern, setBgPattern] = useState('peach');
 
@@ -363,7 +364,12 @@ export default function App() {
   if (authView !== 'dashboard') {
     return (
       <>
-        <AuthScreens authView={authView} setAuthView={setAuthView} onRegisterSuccess={() => setShowRegistrationSuccess(true)} />
+        <AuthScreens 
+          authView={authView} 
+          setAuthView={setAuthView} 
+          onRegisterSuccess={() => setShowRegistrationSuccess(true)} 
+          onLoginSuccess={() => setShowWelcomeBackModal(true)}
+        />
         {/* Session Expired Modal */}
         {sessionExpiredMsg && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
@@ -618,6 +624,43 @@ export default function App() {
                 onClick={() => setShowRegistrationSuccess(false)}
               >
                 OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Welcome Back Modal with Sparkles */}
+      {showWelcomeBackModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+          <div 
+            className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-6 text-center shadow-2xl bg-[#FFFBF5] relative overflow-hidden"
+            style={{ padding: '2.5rem 1.5rem' }}
+          >
+            {/* Animated Sparkles Background Layer */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <span className="absolute top-4 left-6 text-2xl animate-pulse delay-75">✨</span>
+              <span className="absolute bottom-6 right-6 text-3xl animate-bounce-short delay-150">🌟</span>
+              <span className="absolute top-10 right-8 text-xl animate-pulse delay-300">💖</span>
+              <span className="absolute bottom-12 left-8 text-2xl animate-pulse delay-700">✨</span>
+            </div>
+            
+            <div className="flex flex-col items-center gap-2 relative z-10 animate-bounce-short">
+              <span className="text-6xl drop-shadow-sm mb-2">🌸</span>
+              <h2 className="font-pixel text-brand-plum text-xl leading-tight text-center px-4">
+                Welcome Back!
+              </h2>
+              <p className="text-brand-plum/80 font-medium text-sm mt-1">
+                We're so happy to see you again.
+              </p>
+            </div>
+            
+            <div className="w-full mt-4 relative z-10">
+              <button 
+                className="w-full retro-btn bg-brand-cream text-brand-plum py-3 font-pixel text-xs tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner uppercase"
+                onClick={() => setShowWelcomeBackModal(false)}
+              >
+                Let's get to work!
               </button>
             </div>
           </div>

@@ -166,6 +166,15 @@ export default function App() {
     return () => clearInterval(interval);
   }, [timerRunning, focusMinutes]);
 
+  // Stop alarm when time up modal closes
+  useEffect(() => {
+    if (!showTimeUpModal) {
+      import('./utils/audio').then(({ stopAlarmSound }) => {
+        if (stopAlarmSound) stopAlarmSound();
+      });
+    }
+  }, [showTimeUpModal]);
+
   // Focus Timer actions
   const handleToggleTimer = () => setTimerRunning(!timerRunning);
   const handleResetTimer = () => {

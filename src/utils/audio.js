@@ -44,6 +44,8 @@ export const playClickSound = () => {
   }
 };
 
+let alarmInterval = null;
+
 export const playAlarmSound = () => {
   const savedSoundFx = localStorage.getItem('tuskee_sound_fx');
   if (savedSoundFx === 'false') return;
@@ -51,33 +53,46 @@ export const playAlarmSound = () => {
   const savedVolume = localStorage.getItem('tuskee_volume');
   const volumeMultiplier = savedVolume ? (parseInt(savedVolume, 10) / 50) : 1;
 
-  try {
-    const ctx = initAudio();
-    
-    // Sequence of 3 notes
-    const notes = [800, 1000, 1200];
-    const duration = 0.15;
-    
-    notes.forEach((freq, index) => {
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      const startTime = ctx.currentTime + index * duration;
+  const playSequence = () => {
+    try {
+      const ctx = initAudio();
       
-      osc.type = 'triangle';
-      osc.frequency.value = freq;
+      // Sequence of 3 notes
+      const notes = [800, 1000, 1200];
+      const duration = 0.15;
       
-      gainNode.gain.setValueAtTime(0, startTime);
-      gainNode.gain.linearRampToValueAtTime(0.2 * volumeMultiplier, startTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + duration);
-      
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      
-      osc.start(startTime);
-      osc.stop(startTime + duration);
-    });
-  } catch (e) {
-    console.error("Audio error", e);
+      notes.forEach((freq, index) => {
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        const startTime = ctx.currentTime + index * duration;
+        
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        
+        gainNode.gain.setValueAtTime(0, startTime);
+        gainNode.gain.linearRampToValueAtTime(0.2 * volumeMultiplier, startTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + duration);
+        
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      });
+    } catch (e) {
+      console.error("Audio error", e);
+    }
+  };
+
+  playSequence();
+  if (alarmInterval) clearInterval(alarmInterval);
+  alarmInterval = setInterval(playSequence, 1500); // Repeat every 1.5s
+};
+
+export const stopAlarmSound = () => {
+  if (alarmInterval) {
+    clearInterval(alarmInterval);
+    alarmInterval = null;
   }
 };
 

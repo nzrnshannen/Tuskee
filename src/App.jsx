@@ -561,10 +561,7 @@ export default function App() {
 
       {/* Time's Up Modal */}
       {showTimeUpModal && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4"
-          onClick={() => setShowTimeUpModal(false)}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
           <div 
             className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-4 text-center animate-bounce-short shadow-2xl"
             style={{ paddingTop: '3rem', paddingBottom: '1.5rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', backgroundColor: '#FFFBF5' }}

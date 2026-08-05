@@ -50,35 +50,76 @@ export const playAlarmSound = () => {
   const savedSoundFx = localStorage.getItem('tuskee_sound_fx');
   if (savedSoundFx === 'false') return;
 
-  const savedVolume = localStorage.getItem('tuskee_volume');
-  const volumeMultiplier = savedVolume ? (parseInt(savedVolume, 10) / 50) : 1;
-
   const playSequence = () => {
     try {
       const ctx = initAudio();
-      
-      // Sequence of 3 notes
-      const notes = [800, 1000, 1200];
-      const duration = 0.15;
-      
-      notes.forEach((freq, index) => {
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        const startTime = ctx.currentTime + index * duration;
-        
-        osc.type = 'triangle';
-        osc.frequency.value = freq;
-        
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(0.2 * volumeMultiplier, startTime + 0.02);
-        gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + duration);
-        
-        osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        
-        osc.start(startTime);
-        osc.stop(startTime + duration);
-      });
+      const savedVolume = localStorage.getItem('tuskee_volume');
+      const volumeMultiplier = savedVolume ? (parseInt(savedVolume, 10) / 50) : 1;
+      const ringtoneType = localStorage.getItem('tuskee_alarm_ringtone') || 'Classic';
+
+      if (ringtoneType === 'Digital') {
+        [1200, 0, 1200].forEach((freq, index) => {
+          if (freq === 0) return; // pause
+          const osc = ctx.createOscillator();
+          const gainNode = ctx.createGain();
+          const startTime = ctx.currentTime + index * 0.15;
+          osc.type = 'square';
+          osc.frequency.value = freq;
+          gainNode.gain.setValueAtTime(0, startTime);
+          gainNode.gain.linearRampToValueAtTime(0.1 * volumeMultiplier, startTime + 0.01);
+          gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + 0.1);
+          osc.connect(gainNode);
+          gainNode.connect(ctx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.1);
+        });
+      } else if (ringtoneType === 'Gentle') {
+        [440, 554].forEach((freq, index) => {
+          const osc = ctx.createOscillator();
+          const gainNode = ctx.createGain();
+          const startTime = ctx.currentTime + index * 0.5;
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gainNode.gain.setValueAtTime(0, startTime);
+          gainNode.gain.linearRampToValueAtTime(0.3 * volumeMultiplier, startTime + 0.1);
+          gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + 0.4);
+          osc.connect(gainNode);
+          gainNode.connect(ctx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.4);
+        });
+      } else if (ringtoneType === 'Retro') {
+        [400, 600, 800, 1000].forEach((freq, index) => {
+          const osc = ctx.createOscillator();
+          const gainNode = ctx.createGain();
+          const startTime = ctx.currentTime + index * 0.1;
+          osc.type = 'sawtooth';
+          osc.frequency.value = freq;
+          gainNode.gain.setValueAtTime(0, startTime);
+          gainNode.gain.linearRampToValueAtTime(0.15 * volumeMultiplier, startTime + 0.01);
+          gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + 0.1);
+          osc.connect(gainNode);
+          gainNode.connect(ctx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.1);
+        });
+      } else {
+        // Classic
+        [800, 1000, 1200].forEach((freq, index) => {
+          const osc = ctx.createOscillator();
+          const gainNode = ctx.createGain();
+          const startTime = ctx.currentTime + index * 0.15;
+          osc.type = 'triangle';
+          osc.frequency.value = freq;
+          gainNode.gain.setValueAtTime(0, startTime);
+          gainNode.gain.linearRampToValueAtTime(0.2 * volumeMultiplier, startTime + 0.02);
+          gainNode.gain.exponentialRampToValueAtTime(0.01 * volumeMultiplier, startTime + 0.15);
+          osc.connect(gainNode);
+          gainNode.connect(ctx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.15);
+        });
+      }
     } catch (e) {
       console.error("Audio error", e);
     }
@@ -87,6 +128,27 @@ export const playAlarmSound = () => {
   playSequence();
   if (alarmInterval) clearInterval(alarmInterval);
   alarmInterval = setInterval(playSequence, 1500); // Repeat every 1.5s
+};
+
+export const previewAlarmSound = (type) => {
+  const savedType = localStorage.getItem('tuskee_alarm_ringtone');
+  localStorage.setItem('tuskee_alarm_ringtone', type); // Temporarily set for the play call
+  
+  if (alarmInterval) {
+    clearInterval(alarmInterval);
+    alarmInterval = null;
+  }
+  
+  playAlarmSound();
+  
+  setTimeout(() => {
+    stopAlarmSound();
+    if (savedType) {
+      localStorage.setItem('tuskee_alarm_ringtone', savedType);
+    } else {
+      localStorage.removeItem('tuskee_alarm_ringtone');
+    }
+  }, 1000); // Stop the preview after 1 second
 };
 
 export const stopAlarmSound = () => {

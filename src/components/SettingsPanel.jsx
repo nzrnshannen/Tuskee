@@ -19,6 +19,7 @@ export default function SettingsPanel({ onBackgroundChange }) {
   // States for Audio
   const [soundFx, setSoundFx] = useState(true);
   const [volume, setVolume] = useState(50);
+  const [alarmRingtone, setAlarmRingtone] = useState('Classic');
   
   // States for Danger Zone
   const [deleteSelection, setDeleteSelection] = useState('All Notes Contents');
@@ -38,6 +39,9 @@ export default function SettingsPanel({ onBackgroundChange }) {
     
     const savedVolume = localStorage.getItem('tuskee_volume');
     if (savedVolume) setVolume(parseInt(savedVolume, 10));
+    
+    const savedRingtone = localStorage.getItem('tuskee_alarm_ringtone');
+    if (savedRingtone) setAlarmRingtone(savedRingtone);
   }, []);
 
   // Handlers
@@ -89,6 +93,14 @@ export default function SettingsPanel({ onBackgroundChange }) {
     const val = e.target.value;
     setVolume(val);
     localStorage.setItem('tuskee_volume', val);
+  };
+
+  const handleRingtoneChange = (type) => {
+    setAlarmRingtone(type);
+    localStorage.setItem('tuskee_alarm_ringtone', type);
+    import('../utils/audio').then(({ previewAlarmSound }) => {
+      if (previewAlarmSound) previewAlarmSound(type);
+    });
   };
 
   const handleDeleteConfirm = () => {
@@ -268,6 +280,28 @@ export default function SettingsPanel({ onBackgroundChange }) {
                     onChange={handleVolumeChange}
                     className="w-full h-3 bg-[#E0D7D9] rounded-lg appearance-none cursor-pointer border-2 border-brand-plum/30 accent-brand-plum"
                   />
+                </div>
+
+                <div className="flex flex-col gap-3 bg-brand-cream border-2 border-brand-plum rounded-xl p-4 shadow-sm">
+                  <label className="font-pixel text-xs text-brand-plum">Pomodoro Ringtone</label>
+                  <p className="font-medium text-[10px] text-brand-plum/60 mb-1 leading-tight">
+                    Select the sound that plays when your focus session ends.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {['Classic', 'Digital', 'Gentle', 'Retro'].map(type => (
+                      <button
+                        key={type}
+                        onClick={() => handleRingtoneChange(type)}
+                        className={`py-2.5 px-3 rounded-lg font-pixel text-[10px] transition-transform active:translate-y-[2px] border-2 ${
+                          alarmRingtone === type 
+                            ? 'border-brand-plum shadow-sm bg-[#D2E4D6] text-brand-plum' 
+                            : 'border-brand-plum/20 bg-brand-white/80 text-brand-plum/80 hover:border-brand-plum/50'
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

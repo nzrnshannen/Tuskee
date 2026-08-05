@@ -65,9 +65,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const checkErrorAndLogout = (error) => {
-    if (error && (error.code === 'PGRST301' || error.status === 401 || error.message?.includes('JWT'))) {
-      logout('session_expired');
-      return true;
+    if (error) {
+      if (error.code === 'PGRST301' || error.status === 401 || error.message?.includes('JWT')) {
+        logout('session_expired');
+        return true;
+      }
+      console.error('Supabase error:', error);
     }
     return false;
   };

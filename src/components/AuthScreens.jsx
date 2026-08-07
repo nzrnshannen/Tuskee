@@ -15,6 +15,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showUnregisteredModal, setShowUnregisteredModal] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const [failedOtpAttempts, setFailedOtpAttempts] = useState(0);
 
@@ -47,6 +48,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
     setConfirmNewPassword('');
     setShowRecoveryModal(false);
     setShowSuccessModal(false);
+    setShowUnregisteredModal(false);
     setFailedOtpAttempts(0);
     setAuthView(view);
   };
@@ -114,6 +116,16 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
     if (cooldownTime > 0) return;
     setLoading(true);
     setError(null);
+    
+    // Check if email exists
+    const { data: exists, error: rpcError } = await supabase.rpc('check_email_exists', { check_email: email });
+    
+    if (!rpcError && exists !== null && !exists) {
+      setShowUnregisteredModal(true);
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) {
       setError(error.message);
@@ -645,6 +657,24 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
             <div className="w-full mt-2">
               <button className="w-full retro-btn bg-[#D2E4D6] text-brand-plum py-2.5 font-pixel text-[10px] tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner uppercase"
                 onClick={() => switchView('login')}>
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unregistered Modal */}
+      {showUnregisteredModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-plum/20 backdrop-blur-sm p-4">
+          <div className="retro-window border-2 border-brand-plum max-w-sm w-full flex flex-col items-center gap-6 text-center shadow-2xl bg-[#FFFBF5]" style={{ padding: '2rem 1.5rem' }}>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl drop-shadow-sm">⚠️</span>
+              <h2 className="font-pixel text-brand-plum text-lg leading-tight mt-2">Account is unregistered!</h2>
+            </div>
+            <div className="w-full mt-2">
+              <button className="w-full retro-btn bg-[#D2E4D6] text-brand-plum py-2.5 font-pixel text-[10px] tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner uppercase"
+                onClick={() => setShowUnregisteredModal(false)}>
                 OK
               </button>
             </div>

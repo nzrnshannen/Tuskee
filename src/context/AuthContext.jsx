@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [gameStats, setGameStats] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
+        setIsPasswordRecovery(true);
         window.dispatchEvent(new CustomEvent('password_recovery'));
       }
       
@@ -41,6 +43,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('tuskee_bg_pattern');
         setProfile(null);
         setGameStats({});
+        setIsPasswordRecovery(false);
         setLoading(false);
       } else if (session?.user) {
         fetchUserData(session.user.id);
@@ -135,6 +138,7 @@ export const AuthProvider = ({ children }) => {
     user,
     profile,
     gameStats,
+    isPasswordRecovery,
     updateProfile,
     updateGameStats,
     loading,

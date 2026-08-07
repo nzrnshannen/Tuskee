@@ -36,7 +36,7 @@ const DesktopIcon = ({ emoji, label, isActive, onClick }) => {
 };
 
 export default function App() {
-  const { session, profile, updateProfile, logout } = useAuth();
+  const { session, profile, updateProfile, logout, isPasswordRecovery } = useAuth();
   
   // Global Authentication and Splash State
   const [loading, setLoading] = useState(true);
@@ -53,11 +53,15 @@ export default function App() {
   // Initialize session view
   useEffect(() => {
     if (session) {
-      setAuthView((prev) => prev === 'update_password' ? prev : 'dashboard');
+      if (isPasswordRecovery) {
+        setAuthView('update_password');
+      } else {
+        setAuthView((prev) => prev === 'update_password' ? prev : 'dashboard');
+      }
     } else {
       setAuthView((prev) => prev === 'dashboard' ? 'landing' : prev);
     }
-  }, [session]);
+  }, [session, isPasswordRecovery]);
 
   // Global Active Date Key (YYYY-MM-DD)
   const [activeDate, setActiveDate] = useState(

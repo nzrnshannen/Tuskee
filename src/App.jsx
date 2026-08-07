@@ -52,8 +52,11 @@ export default function App() {
 
   // Initialize session view
   useEffect(() => {
-    if (session) setAuthView('dashboard');
-    else setAuthView('landing');
+    if (session) {
+      setAuthView((prev) => prev === 'update_password' ? prev : 'dashboard');
+    } else {
+      setAuthView((prev) => prev === 'dashboard' ? 'landing' : prev);
+    }
   }, [session]);
 
   // Global Active Date Key (YYYY-MM-DD)

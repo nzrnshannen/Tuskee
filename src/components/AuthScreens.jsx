@@ -151,6 +151,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
     if (error) {
       setError(error.message);
     } else {
+      await supabase.auth.signOut();
       setShowSuccessModal(true);
     }
     setLoading(false);
@@ -508,7 +509,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
           </div>
           
           <div className="flex flex-col gap-1">
-            <label className="font-pixel text-[10px] text-brand-plum uppercase tracking-wider">Confirm New Password</label>
+            <label className="font-pixel text-[10px] text-brand-plum uppercase tracking-wider">Repeat New Password</label>
             <div className="relative">
               <input 
                 type={showConfirmPassword ? "text" : "password"} 
@@ -516,7 +517,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
                 value={confirmNewPassword}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                 className="w-full bg-[#FFFDF9] border-2 border-brand-plum focus:border-brand-plum focus:bg-white text-brand-plum px-3 py-2 pr-10 text-sm font-medium outline-none transition-colors"
-                placeholder="Confirm new password"
+                placeholder="Repeat new password"
               />
               <button
                 type="button"
@@ -602,7 +603,7 @@ export default function AuthScreens({ authView, setAuthView, onRegisterSuccess, 
             <div className="w-full mt-2">
               <button className="w-full retro-btn bg-[#D2E4D6] text-brand-plum py-2.5 font-pixel text-[10px] tracking-wider border-2 border-brand-plum active:translate-y-[1px] transition-transform shadow-sm hover:shadow-inner uppercase"
                 onClick={() => switchView('login')}>
-                OK
+                Go back to Login
               </button>
             </div>
           </div>

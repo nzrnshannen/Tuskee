@@ -74,8 +74,15 @@ export default function App() {
       setSessionExpiredMsg(true);
       setAuthView('login');
     };
+    const handlePasswordRecovery = () => {
+      setAuthView('update_password');
+    };
     window.addEventListener('session_expired', handleSessionExpired);
-    return () => window.removeEventListener('session_expired', handleSessionExpired);
+    window.addEventListener('password_recovery', handlePasswordRecovery);
+    return () => {
+      window.removeEventListener('session_expired', handleSessionExpired);
+      window.removeEventListener('password_recovery', handlePasswordRecovery);
+    };
   }, []);
 
   useEffect(() => {
